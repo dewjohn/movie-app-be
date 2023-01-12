@@ -1,9 +1,6 @@
 package controller
 
 import (
-	"github.com/gin-gonic/gin"
-	"golang.org/x/crypto/bcrypt"
-	"gorm.io/gorm"
 	"log"
 	"movie-app/common"
 	"movie-app/dto"
@@ -11,14 +8,23 @@ import (
 	"movie-app/response"
 	"movie-app/utils"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
+	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
 
 func Register(ctx *gin.Context) {
 	DB := common.GetDB()
 	// 获取参数
-	name := ctx.PostForm("name")
-	telephone := ctx.PostForm("telephone")
-	password := ctx.PostForm("password")
+	var requestUser = model.User{}
+	err := ctx.Bind(&requestUser)
+	if err != nil {
+		return
+	}
+	name := requestUser.Name
+	telephone := requestUser.Telephone
+	password := requestUser.Password
 	// 验证数据
 	if len(telephone) != 11 {
 		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "手机号必须为11位")
@@ -52,19 +58,31 @@ func Register(ctx *gin.Context) {
 	}
 	DB.Create(&newUser)
 
+	// 发放token
+	token, err := common.ReleaseToken(newUser)
+	if err != nil {
+		response.Response(ctx, http.StatusInternalServerError, 500, nil, "系统异常")
+		log.Printf("token generate error: %v", err)
+		return
+	}
 	// 返回结果
 	//ctx.JSON(200, gin.H{
 	//	"code": 200,
 	//	"msg":  "注册成功",
 	//})
-	response.Success(ctx, nil, "注册成功")
+	response.Success(ctx, gin.H{"token": token}, "注册成功")
 }
 
 func Login(ctx *gin.Context) {
 	DB := common.GetDB()
 	// 获取参数
-	telephone := ctx.PostForm("telephone")
-	password := ctx.PostForm("password")
+	var requestUser = model.User{}
+	err := ctx.Bind(&requestUser)
+	if err != nil {
+		return
+	}
+	telephone := requestUser.Telephone
+	password := requestUser.Password
 	// 数据验证
 	if len(telephone) != 11 {
 		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "手机号必须为11位")

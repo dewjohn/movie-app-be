@@ -6,7 +6,8 @@ import (
 )
 
 func RandomString(n int) string {
-	letters := []byte("qwertyuioplkjhgfdsazxcvbnm")
+	letters := []byte("qwertyuiop[]';lkjhgfdsazxcvbnm,./?><" +
+		"';")
 	result := make([]byte, n)
 	rand.Seed(time.Now().Unix())
 	for i := range result {
