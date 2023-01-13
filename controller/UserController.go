@@ -11,23 +11,27 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
-	"gorm.io/gorm"
 )
 
 func Register(ctx *gin.Context) {
 	DB := common.GetDB()
 	// 获取参数
-	var requestUser = model.User{}
+	var requestUser = dto.RegisterDto{}
 	err := ctx.Bind(&requestUser)
 	if err != nil {
 		return
 	}
 	name := requestUser.Name
+	email := requestUser.Email
 	telephone := requestUser.Telephone
 	password := requestUser.Password
 	// 验证数据
 	if len(telephone) != 11 {
 		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "手机号必须为11位")
+		return
+	}
+	if !utils.VerifyEmailFormat(email) {
+		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "邮箱格式错误")
 		return
 	}
 	if len(password) != 6 {
@@ -40,7 +44,7 @@ func Register(ctx *gin.Context) {
 	}
 
 	// 判断手机号是否存在
-	if isTelephoneExist(DB, telephone) {
+	if utils.IsTelephoneExist(DB, telephone) {
 		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "用户已经存在")
 		return
 	}
@@ -124,14 +128,4 @@ func Login(ctx *gin.Context) {
 func Info(ctx *gin.Context) {
 	user, _ := ctx.Get("user")
 	response.Response(ctx, http.StatusOK, 200, gin.H{"user": dto.ToUserDto(user.(model.User))}, "获取个人信息成功")
-
-}
-
-func isTelephoneExist(db *gorm.DB, telephone string) bool {
-	var user model.User
-	db.Where("telephone = ?", telephone).First(&user)
-	if user.ID != 0 {
-		return true
-	}
-	return false
 }

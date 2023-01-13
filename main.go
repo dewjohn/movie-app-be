@@ -1,11 +1,12 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/spf13/viper"
 	"movie-app/common"
 	"movie-app/routes"
 	"os"
+
+	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
 )
 
 func main() {
@@ -18,7 +19,7 @@ func main() {
 	if port != "" {
 		panic(r.Run(":" + port))
 	}
-	panic(r.Run()) // listen and  serve on 0.0.0.0:8080
+	panic(r.Run())
 }
 func InitConfig() {
 	workDir, _ := os.Getwd()
