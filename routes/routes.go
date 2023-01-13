@@ -1,7 +1,6 @@
 package routes
 
 import (
-	"movie-app/controller"
 	"movie-app/middleWare"
 
 	"github.com/gin-gonic/gin"
@@ -9,8 +8,10 @@ import (
 
 func CollectRoute(r *gin.Engine) *gin.Engine {
 	r.Use(middleWare.CorsMiddleWare())
-	r.POST("/api/auth/register", controller.Register)
-	r.POST("/api/auth/login", controller.Login)
-	r.GET("api/auth/info", middleWare.AuthMiddleWare(), controller.Info)
+	v1 := r.Group("/api/v1")
+	{
+		GetUserRoutes(v1)
+		GetMovieRoutes(v1)
+	}
 	return r
 }

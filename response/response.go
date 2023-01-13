@@ -1,8 +1,9 @@
 package response
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 func Response(ctx *gin.Context, httpStatus int, code int, data gin.H, msg string) {
@@ -15,4 +16,16 @@ func Success(ctx *gin.Context, data gin.H, msg string) {
 
 func Fail(ctx *gin.Context, data gin.H, msg string) {
 	Response(ctx, http.StatusBadRequest, 400, data, msg)
+}
+
+type ResponseStruct struct {
+	HttpStatus int    //http状态
+	Code       int    //状态码
+	Data       gin.H  //数据
+	Msg        string //信息
+}
+
+// 统一处理返回信息
+func HandleResponse(ctx *gin.Context, res ResponseStruct) {
+	ctx.JSON(res.HttpStatus, gin.H{"code": res.Code, "data": res.Data, "msg": res.Msg})
 }
