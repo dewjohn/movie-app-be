@@ -15,7 +15,7 @@ func AuthMiddleWare() gin.HandlerFunc {
 
 		// 验证token格式
 		if tokenString == "" || !strings.HasPrefix(tokenString, "Bearer ") {
-			ctx.JSON(http.StatusUnauthorized, gin.H{"code": 401, "msg": "权限不足"})
+			ctx.JSON(http.StatusUnauthorized, gin.H{"code": 401, "msg": "请先登录"})
 			ctx.Abort()
 			return
 		}
@@ -24,7 +24,7 @@ func AuthMiddleWare() gin.HandlerFunc {
 
 		token, claims, err := common.ParseToken(tokenString)
 		if err != nil || !token.Valid {
-			ctx.JSON(http.StatusUnauthorized, gin.H{"code": 401, "msg": "权限不足"})
+			ctx.JSON(http.StatusUnauthorized, gin.H{"code": 401, "msg": "请先登录"})
 			ctx.Abort()
 			return
 		}
@@ -37,11 +37,12 @@ func AuthMiddleWare() gin.HandlerFunc {
 
 		// 用户
 		if user.ID == 0 {
-			ctx.JSON(http.StatusUnauthorized, gin.H{"code": 401, "msg": "权限不足"})
+			ctx.JSON(http.StatusUnauthorized, gin.H{"code": 401, "msg": "请先登录"})
 			ctx.Abort()
 			return
 		}
 		// 用户存在,将user信息写入上下文
+		ctx.Set("userId", user.ID)
 		ctx.Set("user", user)
 		ctx.Next()
 	}

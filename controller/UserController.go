@@ -1,8 +1,6 @@
 package controller
 
 import (
-	"log"
-	"movie-app/common"
 	"movie-app/dto"
 	"movie-app/model"
 	"movie-app/response"
@@ -10,9 +8,9 @@ import (
 	"movie-app/utils"
 	"movie-app/vo"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
-	"golang.org/x/crypto/bcrypt"
 )
 
 // 注册
@@ -38,7 +36,7 @@ func Register(ctx *gin.Context) {
 		return
 	}
 	if len(password) < 6 {
-		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "密码至少为6位")
+		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "密码至少6位")
 		return
 	}
 	// 如果名称没有传，随机字符串
@@ -51,7 +49,6 @@ func Register(ctx *gin.Context) {
 
 // 登陆
 func Login(ctx *gin.Context) {
-	DB := common.GetDB()
 	// 获取参数
 	var requestUser = dto.LoginDto{}
 	err := ctx.Bind(&requestUser)
@@ -65,34 +62,63 @@ func Login(ctx *gin.Context) {
 		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "手机号必须为11位")
 		return
 	}
-	if len(password) != 6 {
+	if len(password) < 6 {
 		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "密码至少为6位")
 		return
 	}
-	// 判断手机号是否存在
-	var user model.User
-	DB.Where("telephone = ?", telephone).First(&user)
-	if user.ID == 0 {
-		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "用户不存在")
-		return
-	}
-	// 判断密码是否正确
-	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {
-		response.Response(ctx, http.StatusBadRequest, 400, nil, "密码错误")
-		return
-	}
-	// 发放token
-	token, err := common.ReleaseToken(user)
-	if err != nil {
-		response.Response(ctx, http.StatusInternalServerError, 500, nil, "系统异常")
-		log.Printf("token generate error: %v", err)
-		return
-	}
-	response.Success(ctx, gin.H{"token": token}, "登陆成功")
+	res := service.LoginService(requestUser)
+	response.HandleResponse(ctx, res)
 }
 
 // 用户获取个人信息
-func Info(ctx *gin.Context) {
+func UserInfo(ctx *gin.Context) {
 	user, _ := ctx.Get("user")
 	response.Response(ctx, http.StatusOK, 200, gin.H{"user": vo.ToUserVo(user.(model.User))}, "获取个人信息成功")
+}
+
+// 用户修改个人信息
+func UserModify(ctx *gin.Context) {
+	var requestUser = dto.UserModifyDto{}
+	err := ctx.Bind(&requestUser)
+
+	name := requestUser.Name
+	birthday := requestUser.Birthday
+
+	// 判断昵称
+	if len(name) == 0 {
+		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "昵称不能为空")
+		return
+	}
+	// 判断日期
+	_, err = time.Parse("2006-01-02", birthday)
+	if err != nil {
+		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "日期错误")
+		return
+	}
+
+	// 获取上下文的 userId
+	userId, _ := ctx.Get("userId")
+	res := service.UserModifyService(requestUser, userId)
+	response.HandleResponse(ctx, res)
+}
+
+// 用户修改密码
+func UserModifyPassword(ctx *gin.Context) {
+	var requestUser = dto.UserModifyPasswordDto{}
+	err := ctx.Bind(&requestUser)
+	if err != nil {
+		response.Fail(ctx, nil, "请求错误")
+		return
+	}
+	// 判断密码不能为空
+	if len(requestUser.Password) < 6 {
+		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "密码至少6位")
+		return
+	}
+	// 获取上下文的 user
+	user, _ := ctx.Get("user")
+	modelUser := user.(model.User)
+
+	res := service.UserModifyPasswordService(requestUser, modelUser)
+	response.HandleResponse(ctx, res)
 }
