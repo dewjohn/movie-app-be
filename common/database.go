@@ -24,6 +24,7 @@ func InitDB() *gorm.DB {
 
 	// 自动新建表 AutoMigrate 用于自动迁移您的 schema，保持您的 schema 是最新的。
 	db.AutoMigrate(&model.User{})
+	db.AutoMigrate(&model.Admin{})
 	db.AutoMigrate(&model.Movie{})
 	DB = db
 	return db

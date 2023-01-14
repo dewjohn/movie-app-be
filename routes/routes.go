@@ -11,6 +11,7 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 	v1 := r.Group("/api/v1")
 	{
 		GetUserRoutes(v1)
+		GetAdminRoutes(v1)
 		GetMovieRoutes(v1)
 	}
 	return r
