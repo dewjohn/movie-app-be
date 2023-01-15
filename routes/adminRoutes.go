@@ -15,7 +15,7 @@ func GetAdminRoutes(route *gin.RouterGroup) {
 		adminAuth := admin.Group("/")
 		adminAuth.Use(middleWare.AdminAuthMiddleWare())
 		{
-
+			adminAuth.POST("/addAdmin", admin2.AddAdmin) // 新增管理员
 		}
 	}
 }

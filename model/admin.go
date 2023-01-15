@@ -12,5 +12,5 @@ type Admin struct {
 	Email     string `gorm:"varchar(20);not null;index"`
 	Telephone string `gorm:"type:varchar(11); not null;unique"`
 	Password  string `gorm:"size:225;not null"`
-	Authority string `gorm:"not null"`
+	Authority int    `gorm:"not null"`
 }

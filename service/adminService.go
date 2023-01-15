@@ -8,6 +8,7 @@ import (
 	"movie-app/dto"
 	"movie-app/model"
 	"movie-app/response"
+	"movie-app/utils"
 	"net/http"
 )
 
@@ -59,13 +60,11 @@ func AddAdminService(requestAdmin dto.AddAdminDto) response.ResponseStruct {
 		Msg:        "新增管理员成功",
 	}
 	// 判断手机号是否存在
-	var admin model.Admin
-	DB.Where("telephone = ?", requestAdmin.Telephone).First(&admin)
-	if admin.ID == 0 {
+	if utils.IsAdminTelephoneExit(DB, requestAdmin.Telephone) {
 		res.HttpStatus = http.StatusUnprocessableEntity
 		res.Code = 422
 		res.Msg = "管理员已存在"
-
+		return res
 	}
 	// 加密密码
 	hasedPassword, err := bcrypt.GenerateFromPassword([]byte(requestAdmin.Password), bcrypt.DefaultCost)

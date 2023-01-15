@@ -10,5 +10,5 @@ type AddAdminDto struct {
 	Email     string `json:"email"`
 	Telephone string `json:"telephone"`
 	Password  string `json:"password"`
-	Authority string `json:"authority"`
+	Authority int    `json:"authority"`
 }
