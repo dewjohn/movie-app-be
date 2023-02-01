@@ -90,7 +90,7 @@ func UserModify(ctx *gin.Context) {
 		return
 	}
 	// 判断日期
-	_, err = time.Parse("2006-01-02", birthday)
+	tBirthday, err := time.Parse("2006-01-02", birthday)
 	if err != nil {
 		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "日期错误")
 		return
@@ -98,7 +98,7 @@ func UserModify(ctx *gin.Context) {
 
 	// 获取上下文的 userId
 	userId, _ := ctx.Get("userId")
-	res := service.UserModifyService(requestUser, userId)
+	res := service.UserModifyService(requestUser, userId, tBirthday)
 	response.HandleResponse(ctx, res)
 }
 

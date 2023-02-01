@@ -30,5 +30,4 @@ func InitConfig() {
 	if err != nil {
 		panic("")
 	}
-
 }

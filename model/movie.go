@@ -8,6 +8,7 @@ import (
 
 type Movie struct {
 	gorm.Model
+	AdminId      uint      `gorm:"not null;index"` // 上传者ID
 	Title        string    `gorm:"type:varchar(50);not null;index"`
 	Cover        string    `gorm:"size:255;not null"`
 	Videos       string    `gorm:"size:255;"`            // 先用字符串视频链接，下一版本引入本地视频

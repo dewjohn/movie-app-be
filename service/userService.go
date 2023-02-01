@@ -9,6 +9,7 @@ import (
 	"movie-app/response"
 	"movie-app/utils"
 	"net/http"
+	"time"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -19,13 +20,13 @@ func RegisterService(requestUser dto.RegisterDto) response.ResponseStruct {
 		HttpStatus: http.StatusOK,
 		Code:       http.StatusOK,
 		Data:       nil,
-		Msg:        "注册成功",
+		Msg:        response.OK,
 	}
 	// 判断手机号是否存在
 	if utils.IsTelephoneExist(DB, requestUser.Telephone) {
 		res.HttpStatus = http.StatusUnprocessableEntity
 		res.Code = 422
-		res.Msg = "用户已存在"
+		res.Msg = response.PhoneRegistered
 		return res
 	}
 
@@ -34,7 +35,7 @@ func RegisterService(requestUser dto.RegisterDto) response.ResponseStruct {
 	if err != nil {
 		res.HttpStatus = http.StatusInternalServerError
 		res.Code = 500
-		res.Msg = "加密错误"
+		res.Msg = response.SystemError
 		return res
 	}
 
@@ -56,7 +57,7 @@ func LoginService(requestUser dto.LoginDto) response.ResponseStruct {
 		HttpStatus: http.StatusOK,
 		Code:       http.StatusOK,
 		Data:       nil,
-		Msg:        "登陆成功",
+		Msg:        response.OK,
 	}
 	// 判断手机号是否存在
 	var user model.User
@@ -64,14 +65,14 @@ func LoginService(requestUser dto.LoginDto) response.ResponseStruct {
 	if user.ID == 0 {
 		res.HttpStatus = http.StatusUnprocessableEntity
 		res.Code = 422
-		res.Msg = "用户不存在"
+		res.Msg = response.UserNoExit
 		return res
 	}
 	// 判断密码是否正确
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(requestUser.Password)); err != nil {
 		res.HttpStatus = http.StatusBadRequest
 		res.Code = 400
-		res.Msg = "密码错误"
+		res.Msg = response.PasswordError
 		return res
 	}
 	// 发放token
@@ -79,7 +80,7 @@ func LoginService(requestUser dto.LoginDto) response.ResponseStruct {
 	if err != nil {
 		res.HttpStatus = http.StatusInternalServerError
 		res.Code = 500
-		res.Msg = "系统异常"
+		res.Msg = response.SystemError
 		log.Printf("token generate error: %v", err)
 		return res
 	}
@@ -88,25 +89,25 @@ func LoginService(requestUser dto.LoginDto) response.ResponseStruct {
 	return res
 }
 
-func UserModifyService(requestUser dto.UserModifyDto, userId interface{}) response.ResponseStruct {
+func UserModifyService(requestUser dto.UserModifyDto, userId interface{}, tBirthday time.Time) response.ResponseStruct {
 	res := response.ResponseStruct{
 		HttpStatus: http.StatusOK,
 		Code:       http.StatusOK,
 		Data:       nil,
-		Msg:        "修改个人信息成功",
+		Msg:        response.OK,
 	}
 	DB := common.GetDB()
 	err := DB.Model(model.User{}).Where("id = ?", userId).Updates(map[string]interface{}{
 		"name":     requestUser.Name,
 		"avatar":   requestUser.Avatar,
 		"gender":   requestUser.Gender,
-		"birthday": requestUser.Birthday,
+		"birthday": tBirthday,
 		"sign":     requestUser.Sign,
 	}).Error
 	if err != nil {
 		res.HttpStatus = http.StatusInternalServerError
 		res.Code = 500
-		res.Msg = "修改失败"
+		res.Msg = response.SystemError
 	}
 	return res
 }
@@ -117,7 +118,7 @@ func UserModifyPasswordService(requestUser dto.UserModifyPasswordDto, user model
 		HttpStatus: http.StatusOK,
 		Code:       http.StatusOK,
 		Data:       nil,
-		Msg:        "修改成功",
+		Msg:        response.OK,
 	}
 
 	// 验证旧密码
@@ -125,7 +126,7 @@ func UserModifyPasswordService(requestUser dto.UserModifyPasswordDto, user model
 	if !isRight {
 		res.HttpStatus = http.StatusBadRequest
 		res.Code = 422
-		res.Msg = "旧密码错误"
+		res.Msg = response.OldPasswordError
 		return res
 	}
 
@@ -136,14 +137,14 @@ func UserModifyPasswordService(requestUser dto.UserModifyPasswordDto, user model
 	if err1 != nil {
 		res.HttpStatus = http.StatusInternalServerError
 		res.Code = 500
-		res.Msg = "加密错误"
+		res.Msg = response.SystemError
 		return res
 	}
 	err := DB.Model(&user).Update("password", hasedPassword).Error
 	if err != nil {
 		res.HttpStatus = http.StatusBadRequest
 		res.Code = 500
-		res.Msg = "修改密码失败"
+		res.Msg = response.SystemError
 		return res
 	}
 	return res

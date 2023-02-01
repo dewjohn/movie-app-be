@@ -18,7 +18,7 @@ func AdminLoginService(requestAdmin dto.AdminLoginDto) response.ResponseStruct {
 		HttpStatus: http.StatusOK,
 		Code:       http.StatusOK,
 		Data:       nil,
-		Msg:        "登陆成功",
+		Msg:        response.OK,
 	}
 	// 判断手机号是否存在
 	var admin model.Admin
@@ -26,7 +26,7 @@ func AdminLoginService(requestAdmin dto.AdminLoginDto) response.ResponseStruct {
 	if admin.ID == 0 {
 		res.HttpStatus = http.StatusUnprocessableEntity
 		res.Code = 422
-		res.Msg = "用户不存在"
+		res.Msg = response.UserNoExit
 		return res
 	}
 	// 判断密码是否正确
@@ -34,7 +34,7 @@ func AdminLoginService(requestAdmin dto.AdminLoginDto) response.ResponseStruct {
 	if err := bcrypt.CompareHashAndPassword([]byte(admin.Password), []byte(requestAdmin.Password)); err != nil {
 		res.HttpStatus = http.StatusBadRequest
 		res.Code = 400
-		res.Msg = "密码错误"
+		res.Msg = response.PasswordError
 		return res
 	}
 	// 发放 token
@@ -42,7 +42,7 @@ func AdminLoginService(requestAdmin dto.AdminLoginDto) response.ResponseStruct {
 	if err != nil {
 		res.HttpStatus = http.StatusInternalServerError
 		res.Code = 500
-		res.Msg = "系统异常"
+		res.Msg = response.SystemError
 		log.Printf("admin_token generate error: %v", err)
 		return res
 	}
@@ -57,13 +57,13 @@ func AddAdminService(requestAdmin dto.AddAdminDto) response.ResponseStruct {
 		HttpStatus: http.StatusOK,
 		Code:       http.StatusOK,
 		Data:       nil,
-		Msg:        "新增管理员成功",
+		Msg:        response.OK,
 	}
 	// 判断手机号是否存在
 	if utils.IsAdminTelephoneExit(DB, requestAdmin.Telephone) {
 		res.HttpStatus = http.StatusUnprocessableEntity
 		res.Code = 422
-		res.Msg = "管理员已存在"
+		res.Msg = response.PhoneRegistered
 		return res
 	}
 	// 加密密码
@@ -71,7 +71,7 @@ func AddAdminService(requestAdmin dto.AddAdminDto) response.ResponseStruct {
 	if err != nil {
 		res.HttpStatus = http.StatusInternalServerError
 		res.Code = 500
-		res.Msg = "加密错误"
+		res.Msg = response.SystemError
 		return res
 	}
 	// 新增管理员

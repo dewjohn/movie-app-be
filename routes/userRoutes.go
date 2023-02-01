@@ -14,7 +14,7 @@ func GetUserRoutes(route *gin.RouterGroup) {
 
 		//需要用户登录
 		userAuth := user.Group("/")
-		userAuth.Use(middleWare.AuthMiddleWare())
+		userAuth.Use(middleWare.UserAuthMiddleWare())
 		{
 
 			userAuth.GET("/info", controller.UserInfo)

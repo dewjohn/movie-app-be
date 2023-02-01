@@ -18,6 +18,10 @@ func Fail(ctx *gin.Context, data gin.H, msg string) {
 	Response(ctx, http.StatusBadRequest, 400, data, msg)
 }
 
+func CheckFail(ctx *gin.Context, data gin.H, msg string) {
+	Response(ctx, http.StatusUnprocessableEntity, 422, data, msg)
+}
+
 type ResponseStruct struct {
 	HttpStatus int    //http状态
 	Code       int    //状态码

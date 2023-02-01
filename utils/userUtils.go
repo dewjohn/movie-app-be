@@ -40,7 +40,7 @@ func IsTelephoneExist(db *gorm.DB, telephone string) bool {
 	return false
 }
 
-// 验证加密后的密码
+// ComparePasswords 验证加密后的密码
 func ComparePasswords(hashedPwd string, plainPwd []byte) bool {
 	byteHash := []byte(hashedPwd)
 	err := bcrypt.CompareHashAndPassword(byteHash, plainPwd)

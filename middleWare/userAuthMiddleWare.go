@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func AuthMiddleWare() gin.HandlerFunc {
+func UserAuthMiddleWare() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		// 获取 header
 		tokenString := ctx.GetHeader("Authorization")
