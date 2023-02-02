@@ -37,3 +37,34 @@ func UploadVideoInfoService(video dto.VideoDto, adminId interface{}, tReleaseTim
 	res.Data = gin.H{"vid": newVideo.ID}
 	return res
 }
+
+func ModifyVideoInfoService(video dto.ModifyVideoDto, tReleaseTime time.Time) response.ResponseStruct {
+	res := response.ResponseStruct{
+		HttpStatus: http.StatusOK,
+		Code:       200,
+		Data:       nil,
+		Msg:        response.OK,
+	}
+
+	DB := common.GetDB()
+	err := DB.Model(&model.Movie{}).Where("id = ?", video.Vid).Updates(
+		map[string]interface{}{
+			"title":        video.Title,
+			"cover":        video.Cover,
+			"release_time": tReleaseTime,
+			"sheet_length": video.SheetLength,
+			"origin":       video.Origin,
+			"type":         video.Type,
+			"director":     video.Director,
+			"screenwriter": video.Screenwriter,
+			"actors":       video.Actors,
+			"language":     video.Language,
+			"introduction": video.Introduction,
+		}).Error
+	if err != nil {
+		res.HttpStatus = http.StatusInternalServerError
+		res.Code = 500
+		res.Msg = response.SystemError
+	}
+	return res
+}
