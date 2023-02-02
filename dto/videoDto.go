@@ -1,7 +1,6 @@
 package dto
 
 type VideoDto struct {
-	Uid   uint   `json:"uid"`
 	Title string `gorm:"type:varchar(50);not null;index"`
 	Cover string `gorm:"size:255;not null"`
 	//Videos       string    `gorm:"size:255;"`    // 先用字符串视频链接，下一版本引入本地视频
@@ -15,4 +14,12 @@ type VideoDto struct {
 	Language     string `json:"language"`     // 语言
 	Introduction string `json:"introduction"` // 简介
 	//Score        float64   `json:"score"`        // 评分
+}
+
+type ResDto struct {
+	Res360   string
+	Res480   string
+	Res720   string
+	Res1080  string
+	Original string
 }

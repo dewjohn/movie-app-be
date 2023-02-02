@@ -15,7 +15,7 @@ func UploadVideoInfo(ctx *gin.Context) {
 		response.Fail(ctx, nil, "请求错误")
 	}
 	title := video.Title
-	cover := video.Cover
+	cover := video.Cover // 通过 api/v1/upload/cover 接口返回 cover string
 	ReleaseTime := video.ReleaseTime
 	SheetLength := video.SheetLength // 占位符，v2引入自动计算上传视频后获取视频的长度
 	Origin := video.Origin
@@ -30,38 +30,49 @@ func UploadVideoInfo(ctx *gin.Context) {
 	// 验证数据
 	if len(title) == 0 {
 		response.CheckFail(ctx, nil, "标题不能为空")
+		return
 	}
 	if len(cover) == 0 {
 		response.CheckFail(ctx, nil, "视频封面不能为空")
+		return
 	}
 	// 判断日期
 	tReleaseTime, err := time.Parse("2006-01-02", ReleaseTime)
 	if err != nil {
 		response.CheckFail(ctx, nil, "请输入正确日期")
+		return
 	}
 	if SheetLength == 0 {
 		response.CheckFail(ctx, nil, "视频片长不能为空")
+		return
 	}
 	if len(Origin) == 0 {
 		response.CheckFail(ctx, nil, "视频产地不能为空")
+		return
 	}
 	if len(Type) == 0 {
 		response.CheckFail(ctx, nil, "视频类型不能为空")
+		return
 	}
 	if len(Director) == 0 {
 		response.CheckFail(ctx, nil, "请输入导演信息")
+		return
 	}
 	if len(Screenwriter) == 0 {
 		response.CheckFail(ctx, nil, "请输入编剧信息")
+		return
 	}
 	if len(Actors) == 0 {
 		response.CheckFail(ctx, nil, "请输入演员信息")
+		return
 	}
 	if len(Language) == 0 {
 		response.CheckFail(ctx, nil, "请输入电影语言类型")
+		return
 	}
 	if len(Introduction) == 0 {
 		response.CheckFail(ctx, nil, "视频简介不能为空")
+		return
 	}
 	res := service.UploadVideoInfoService(video, adminId, tReleaseTime)
 	response.HandleResponse(ctx, res)

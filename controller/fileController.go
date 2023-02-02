@@ -21,9 +21,12 @@ func UploadAvatar(ctx *gin.Context) {
 		response.CheckFail(ctx, nil, "图片不符合要求")
 	}
 	avatar.Filename = utils.RandomString(3) + strconv.FormatInt(time.Now().UnixNano(), 10) + suffix // 重定义头像命名
-	// 如果不存在upload文件夹创建
-	if _, err := os.Stat("./files.avatar"); os.IsNotExist(err) {
-		os.Mkdir("./files/avatar", os.ModePerm)
+	// 如果不存在avatar文件夹创建
+	if _, err := os.Stat("./files/avatar"); os.IsNotExist(err) {
+		err := os.Mkdir("./files/avatar", os.ModePerm)
+		if err != nil {
+			return
+		}
 	}
 	// 保存文件
 	dst := path.Join("./files/avatar", avatar.Filename)

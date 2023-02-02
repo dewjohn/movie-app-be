@@ -1,15 +1,19 @@
 package main
 
 import (
-	"movie-app/common"
-	"movie-app/routes"
-	"os"
-
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
+	_ "github.com/swaggo/files"
+	_ "github.com/swaggo/gin-swagger"
+	"movie-app/common"
+	"movie-app/docs"
+	"movie-app/routes"
+	"os"
 )
 
 func main() {
+	docs.SwaggerInfo.Title = "movie app"
+	docs.SwaggerInfo.Version = "1.0"
 	InitConfig()
 	db := common.InitDB()
 	_ = db

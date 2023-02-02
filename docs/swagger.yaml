@@ -1,0 +1,37 @@
+info:
+  contact: {}
+paths:
+  /api/v1/user/register:
+    post:
+      parameters:
+      - description: 姓名
+        in: body
+        name: name
+        required: true
+        schema:
+          type: string
+      - description: 邮箱
+        in: body
+        name: email
+        required: true
+        schema:
+          type: string
+      - description: 电话
+        in: body
+        name: telephone
+        required: true
+        schema:
+          type: string
+      - description: 密码
+        in: body
+        name: password
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses: {}
+      summary: 用户注册
+      tags:
+      - User
+swagger: "2.0"

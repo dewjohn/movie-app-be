@@ -13,7 +13,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// 注册
+// @Summary 用户注册
+// @Produce  json
+// @Tags User
+// @Param name body string true "姓名"
+// @Param email body string true "邮箱"
+// @Param telephone body string true "电话"
+// @Param password body string true "密码"
+// @Router /api/v1/user/register [post]
 func Register(ctx *gin.Context) {
 	// 获取参数
 	var requestUser = dto.RegisterDto{}

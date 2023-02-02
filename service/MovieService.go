@@ -1,6 +1,7 @@
 package service
 
 import (
+	"github.com/gin-gonic/gin"
 	"movie-app/common"
 	"movie-app/dto"
 	"movie-app/model"
@@ -33,5 +34,6 @@ func UploadVideoInfoService(video dto.VideoDto, adminId interface{}, tReleaseTim
 	}
 	DB := common.GetDB()
 	DB.Create(&newVideo)
+	res.Data = gin.H{"vid": newVideo.ID}
 	return res
 }

@@ -4,7 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"movie-app/dto"
 	"movie-app/response"
-	"movie-app/service"
+	"movie-app/service/admin"
 	"movie-app/utils"
 	"net/http"
 )
@@ -35,7 +35,7 @@ func AdminLogin(ctx *gin.Context) {
 		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "密码至少6位")
 		return
 	}
-	res := service.AdminLoginService(requestAdmin)
+	res := admin.AdminLoginService(requestAdmin)
 	response.HandleResponse(ctx, res)
 }
 
@@ -74,6 +74,6 @@ func AddAdmin(ctx *gin.Context) {
 	if len(name) == 0 {
 		name = utils.RandomString(10)
 	}
-	res := service.AddAdminService(requestAdmin)
+	res := admin.AddAdminService(requestAdmin)
 	response.HandleResponse(ctx, res)
 }
