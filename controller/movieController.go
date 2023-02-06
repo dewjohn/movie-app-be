@@ -23,3 +23,13 @@ func GetMovieList(ctx *gin.Context) {
 	res := service.GetMovieListService(request)
 	response.HandleResponse(ctx, res)
 }
+
+func GetMovieByID(ctx *gin.Context) {
+	vid, _ := strconv.Atoi(ctx.Query("vid"))
+	if vid == 0 {
+		response.CheckFail(ctx, nil, "视频不存在")
+		return
+	}
+	res := service.GetMovieByIdService(vid)
+	response.HandleResponse(ctx, res)
+}

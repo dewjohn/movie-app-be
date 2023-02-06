@@ -2,6 +2,7 @@ package service
 
 import (
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 	"movie-app/common"
 	"movie-app/dto"
 	"movie-app/model"
@@ -87,4 +88,32 @@ func GetMovieListService(query dto.GetMovieListDto) response.ResponseStruct {
 	res.Data = gin.H{"count": total, "movies": movie}
 
 	return res
+}
+
+func GetMovieByIdService(vid int) response.ResponseStruct {
+	res := response.ResponseStruct{
+		HttpStatus: http.StatusOK,
+		Code:       http.StatusOK,
+		Data:       nil,
+		Msg:        response.OK,
+	}
+	var movie model.Movie
+	DB := common.GetDB()
+	DB.Model(&model.Movie{}).Where("id = ?", vid).First(&movie)
+	if movie.ID == 0 {
+		res.HttpStatus = http.StatusBadRequest
+		res.Code = http.StatusBadRequest
+		res.Msg = "视频不存在"
+		return res
+	}
+	// 获取当前视频的resource
+	resource := GetVideoResource(DB, uint(vid))
+	res.Data = gin.H{"movie": vo.ToVideo(movie, resource)}
+	return res
+}
+
+func GetVideoResource(db *gorm.DB, vid uint) []model.Resource {
+	var resource []model.Resource
+	db.Model(&model.Resource{}).Where("vid = ?", vid).Find(&resource)
+	return resource
 }
