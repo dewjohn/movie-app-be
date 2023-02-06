@@ -98,3 +98,14 @@ func UploadMovieVideo(ctx *gin.Context) {
 	res := admin.UploadVideoService(urls, vid)
 	response.HandleResponse(ctx, res)
 }
+
+func DeleteResource(ctx *gin.Context) {
+	var id dto.UUID
+	err := ctx.Bind(&id)
+	if err != nil {
+		response.Fail(ctx, nil, "请求错误")
+		return
+	}
+	res := admin.DeleteResourceService(id.UUID)
+	response.HandleResponse(ctx, res)
+}

@@ -1,5 +1,7 @@
 package dto
 
+import "github.com/google/uuid"
+
 type VideoDto struct {
 	Title        string `json:"title"`        // 标题
 	Cover        string `json:"cover"`        // 封面
@@ -35,4 +37,17 @@ type ModifyVideoDto struct {
 	Actors       string `json:"actors"`       // 演员
 	Language     string `json:"language"`     // 语言
 	Introduction string `json:"introduction"` // 简介
+}
+
+type VideoIdDto struct {
+	Id uint
+}
+
+type UUID struct {
+	UUID uuid.UUID
+}
+
+type GetMovieListDto struct {
+	Page     int
+	PageSize int
 }

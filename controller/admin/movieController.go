@@ -5,6 +5,7 @@ import (
 	"movie-app/dto"
 	"movie-app/response"
 	"movie-app/service"
+	"movie-app/service/admin"
 	"time"
 )
 
@@ -149,5 +150,22 @@ func ModifyVideoInfo(ctx *gin.Context) {
 		return
 	}
 	res := service.ModifyVideoInfoService(video, tReleaseTime)
+	response.HandleResponse(ctx, res)
+}
+
+// 删除视频信息
+func DeleteMovieVideo(ctx *gin.Context) {
+	var video dto.VideoIdDto
+	err := ctx.Bind(&video)
+	if err != nil {
+		response.Fail(ctx, nil, "请求错误")
+		return
+	}
+	id := video.Id
+	if id == 0 {
+		response.CheckFail(ctx, nil, "视频不存在")
+		return
+	}
+	res := admin.DeleteMovieVideoService(id)
 	response.HandleResponse(ctx, res)
 }

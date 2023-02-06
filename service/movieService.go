@@ -6,6 +6,7 @@ import (
 	"movie-app/dto"
 	"movie-app/model"
 	"movie-app/response"
+	"movie-app/vo"
 	"net/http"
 	"time"
 )
@@ -66,5 +67,24 @@ func ModifyVideoInfoService(video dto.ModifyVideoDto, tReleaseTime time.Time) re
 		res.Code = 500
 		res.Msg = response.SystemError
 	}
+	return res
+}
+
+func GetMovieListService(query dto.GetMovieListDto) response.ResponseStruct {
+	res := response.ResponseStruct{
+		HttpStatus: http.StatusOK,
+		Code:       200,
+		Data:       nil,
+		Msg:        response.OK,
+	}
+	DB := common.GetDB()
+	var total int64 // 记录总数
+	var movie []vo.SearchMovieVo
+	Pagination := DB.Limit(query.PageSize).Offset((query.Page - 1) * query.PageSize)
+
+	Pagination.Model(&model.Movie{}).Select("id, title, cover").Scan(&movie).Count(&total)
+
+	res.Data = gin.H{"count": total, "movies": movie}
+
 	return res
 }
