@@ -4,6 +4,7 @@ import (
 	"movie-app/common"
 	"movie-app/model"
 	"movie-app/response"
+	"movie-app/utils"
 	"net/http"
 )
 
@@ -14,7 +15,7 @@ func UploadAvatarService(localFileName string, objectName string, uid uint) resp
 		Data:       nil,
 		Msg:        response.OK,
 	}
-	url := "/api/" + objectName
+	url := utils.GetUrl() + objectName
 	DB := common.GetDB()
 	DB.Model(model.User{}).Where("id = ?", uid).Update("avatar", url)
 	return res

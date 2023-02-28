@@ -83,7 +83,7 @@ func GetMovieListService(query dto.GetMovieListDto) response.ResponseStruct {
 	var movie []vo.SearchMovieVo
 	Pagination := DB.Limit(query.PageSize).Offset((query.Page - 1) * query.PageSize)
 
-	Pagination.Model(&model.Movie{}).Select("id, title, cover").Scan(&movie).Count(&total)
+	Pagination.Model(&model.Movie{}).Select("id, title, cover, release_time, score").Scan(&movie).Count(&total)
 
 	res.Data = gin.H{"count": total, "movies": movie}
 
@@ -110,6 +110,15 @@ func GetMovieByIdService(vid int) response.ResponseStruct {
 	resource := GetVideoResource(DB, uint(vid))
 	res.Data = gin.H{"movie": vo.ToVideo(movie, resource)}
 	return res
+}
+
+func IsMovieExit(db *gorm.DB, Vid uint) bool {
+	var movie model.Movie
+	db.First(&movie, Vid)
+	if movie.ID != 0 {
+		return true
+	}
+	return false
 }
 
 func GetVideoResource(db *gorm.DB, vid uint) []model.Resource {

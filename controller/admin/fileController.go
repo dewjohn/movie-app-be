@@ -93,7 +93,7 @@ func UploadMovieVideo(ctx *gin.Context) {
 
 	objectName := "movie/" + video.Filename
 	var urls dto.ResDto
-	urls.Original = "/api/" + objectName
+	urls.Original = utils.GetUrl() + "/api/" + objectName
 
 	res := admin.UploadVideoService(urls, vid)
 	response.HandleResponse(ctx, res)

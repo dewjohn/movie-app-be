@@ -6,9 +6,11 @@ import (
 )
 
 type SearchMovieVo struct {
-	ID    uint   `json:"id"`
-	Title string `json:"title"`
-	Cover string `json:"cover"`
+	ID          uint   `json:"id"`
+	Title       string `json:"title"`
+	Cover       string `json:"cover"`
+	ReleaseTime string `json:"releaseTime"`
+	Score       string `json:"score"`
 }
 
 type MovieVo struct {

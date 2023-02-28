@@ -7,6 +7,7 @@ import (
 	"movie-app/dto"
 	"movie-app/model"
 	"movie-app/response"
+	"movie-app/utils"
 	"net/http"
 )
 
@@ -17,7 +18,7 @@ func UploadCoverService(objectName string) response.ResponseStruct {
 		Data:       nil,
 		Msg:        response.OK,
 	}
-	url := "/api/" + objectName
+	url := utils.GetUrl() + objectName
 	res.Data = gin.H{"url": url}
 	return res
 }

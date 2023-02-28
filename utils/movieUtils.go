@@ -2,6 +2,7 @@ package utils
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
 	"movie-app/response"
 )
 
@@ -47,4 +48,8 @@ func verifyMovieInfo(ctx *gin.Context, Title string, Cover string, SheetLength i
 		response.CheckFail(ctx, nil, "视频简介不能为空")
 		return
 	}
+}
+
+func GetUrl() string {
+	return "http://localhost:" + viper.GetString("server.port") + "/api/"
 }

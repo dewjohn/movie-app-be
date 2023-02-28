@@ -17,10 +17,14 @@ type UserModifyDto struct {
 	Birthday string `json:"birthday"`
 	Gender   int    `json:"gender"`
 	Sign     string `json:"sign"`
-	Avatar   string `json:"avatar"` // 暂定为头像外链链接
 }
 
 type UserModifyPasswordDto struct {
 	OldPassword string `json:"oldPassword"`
 	Password    string `json:"password"`
+}
+
+type UserInfoDto struct {
+	Id   uint   `json:"id"`
+	Name string `json:"name"`
 }

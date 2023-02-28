@@ -99,7 +99,6 @@ func UserModifyService(requestUser dto.UserModifyDto, userId interface{}, tBirth
 	DB := common.GetDB()
 	err := DB.Model(&model.User{}).Where("id = ?", userId).Updates(map[string]interface{}{
 		"name":     requestUser.Name,
-		"avatar":   requestUser.Avatar,
 		"gender":   requestUser.Gender,
 		"birthday": tBirthday,
 		"sign":     requestUser.Sign,
