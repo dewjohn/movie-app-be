@@ -49,5 +49,14 @@ func ComparePasswords(hashedPwd string, plainPwd []byte) bool {
 		return false
 	}
 	return true
+}
 
+// 判断该用户对这部电影是否评论过
+func IsReviewedMovie(db *gorm.DB, vid uint, uid interface{}) bool {
+	var reviewer model.Score
+	db.Where("vid = ? and uid = ?", vid, uid).First(&reviewer)
+	if reviewer.ID != 0 {
+		return true
+	}
+	return false
 }

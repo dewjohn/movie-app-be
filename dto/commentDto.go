@@ -4,18 +4,9 @@ type CommentIdDto struct {
 	ID uint
 }
 
-type ReplyIdDto struct {
-	ID uint
-}
-
 type CommentDto struct {
-	Content string
-	Vid     uint
-}
-
-type ReplyDto struct {
-	Cid       uint
-	Content   string
-	ReplyUid  uint
-	ReplyName string
+	Vid      uint   `json:"vid"`
+	Content  string `json:"content"`
+	Uid      uint   `json:"uid"`
+	ParentID uint   `json:"parentId"`
 }

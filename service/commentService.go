@@ -2,7 +2,6 @@ package service
 
 import (
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 	"movie-app/common"
 	"movie-app/dto"
 	"movie-app/model"
@@ -25,120 +24,107 @@ func CommentService(comment dto.CommentDto, uid interface{}) response.ResponseSt
 		res.Msg = "视频不存在"
 		return res
 	}
-	DB.Create(&model.Comment{Vid: comment.Vid, Content: comment.Content, Uid: uid.(uint)})
-	return res
-}
-
-func GetCommentService(page int, pageSize int, vid int) response.ResponseStruct {
-	res := response.ResponseStruct{
-		HttpStatus: http.StatusOK,
-		Code:       200,
-		Data:       nil,
-		Msg:        response.OK,
-	}
-	DB := common.GetDB()
-
-	var count int64
-	var comments []vo.CommentVo
-	SqlComment := "select comments.id, comments.created_at, content, uid, users.name, users.avatar, reply_count " +
-		"from comments,users where comments.deleted_at is null and comments.uid = users.id and vid = ?"
-	SqlReplay := "select content, users.name, reply_uid, reply_name from replies, users " +
-		"where replies.deleted_at is null and replies.uid = users.id and cid = ? limit 2"
-
-	if !IsMovieExit(DB, uint(vid)) {
-		res.HttpStatus = http.StatusBadRequest
-		res.Code = 400
-		res.Msg = "视频不存在"
-		return res
-	}
-	DB.Model(&model.Comment{}).Where("vid = ?", vid).Count(&count)
-	Pagination := DB.Limit(pageSize).Offset((page - 1) * pageSize)
-	Pagination.Raw(SqlComment, vid).Scan(&comments)
-	for i := 0; i < len(comments); i++ {
-		DB.Raw(SqlReplay, comments[i].ID).Scan(&comments[i].Reply)
-	}
-	res.Data = gin.H{"count": count, "comments": comments}
-	return res
-}
-
-func ReplyService(reply dto.ReplyDto, uid interface{}) response.ResponseStruct {
-	res := response.ResponseStruct{
-		HttpStatus: http.StatusOK,
-		Code:       200,
-		Data:       nil,
-		Msg:        response.OK,
-	}
-	DB := common.GetDB()
-
-	if !IsCommentExist(DB, reply.Cid) {
-		res.HttpStatus = http.StatusBadRequest
-		res.Code = 400
-		res.Msg = "评论不存在或已被删除"
-		return res
-	}
-	newReply := model.Reply{
-		Cid:      reply.Cid,
-		Content:  reply.Content,
+	newComment := model.Comment{
+		Vid:      comment.Vid,
+		Content:  comment.Content,
+		ParentId: comment.ParentID,
 		Uid:      uid.(uint),
-		ReplyUid: reply.ReplyUid,
 	}
-	DB.Create(&newReply)
-	DB.Model(&model.Comment{}).Where("id = ?", reply.Cid).UpdateColumn("reply_count", gorm.Expr("reply_count + ?", 1))
+	DB.Create(&newComment)
+	res.Data = gin.H{"id": newComment.ID}
 	return res
 }
 
-func GetReplyDetailsV2Service(cid int, page int, pageSize int) response.ResponseStruct {
+func GetCommentService(vid int, replyCount int, page int, pageSize int) response.ResponseStruct {
+	var total int64        // 总评论数
+	var commentCount int64 // 一级评论数
+	var comments []vo.CommentVo
+
+	DB := common.GetDB()
+	DB.Model(model.Comment{}).Where("vid = ?", vid).Count(&total)
+	DB.Model(model.Comment{}).Where("parent_id != 0 and vid = ?", vid).Count(&commentCount)
+	sql := "select comments.id,comments.created_at,content,users.id as uid,name,avatar from users,comments " +
+		"where comments.deleted_at is null and comments.uid = users.id and vid = ? and parent_id = 0 limit ? offset ?"
+	sqlReply := "select comments.id,comments.created_at,content,users.id as uid,name,avatar from comments,users " +
+		"where comments.deleted_at is null and comments.uid = users.id and parent_id = ? limit ?"
+	DB.Raw(sql, vid, pageSize, (page-1)*pageSize).Scan(&comments)
+
+	if replyCount > 0 {
+		//当需要的回复数大于0时，查询回复
+		for i := 0; i < len(comments); i++ {
+			DB.Raw(sqlReply, comments[i].ID, replyCount).Scan(&comments[i].Reply)
+		}
+	}
+
+	return response.ResponseStruct{
+		HttpStatus: http.StatusOK,
+		Code:       http.StatusOK,
+		Data:       gin.H{"count": total, "comment_count": commentCount, "comments": comments},
+		Msg:        response.OK,
+	}
+}
+
+func GetCommentListService(vid, page, pageSize int) response.ResponseStruct {
+	var total int64 // 记录总数
+	var comments []vo.CommentListVo
+
+	DB := common.GetDB()
+	DB.Model(model.Comment{}).Where("parent_id = 0 and vid = ?", vid).Count(&total)
+	sql := "select comments.id,comments.created_at,content,users.id as uid,name,avatar from users,comments " +
+		"where comments.deleted_at is null and comments.uid = users.id and vid = ? and parent_id = 0 limit ? offset ?"
+	sqlReplyCount := "select count(*) from comments where comments.deleted_at is null and comments.parent_id <> 0 and comments.parent_id = ?"
+
+	DB.Raw(sql, vid, pageSize, (page-1)*pageSize).Scan(&comments)
+
+	for i := 0; i < len(comments); i++ {
+		DB.Raw(sqlReplyCount, comments[i].ID).Scan(&comments[i].ReplyCount)
+	}
+
+	return response.ResponseStruct{
+		HttpStatus: http.StatusOK,
+		Code:       http.StatusOK,
+		Data:       gin.H{"count": total, "comments": comments},
+		Msg:        response.OK,
+	}
+}
+
+func GetReplyDetailsService(cid, offset, page, pageSize int) response.ResponseStruct {
 	res := response.ResponseStruct{
 		HttpStatus: http.StatusOK,
 		Code:       http.StatusOK,
 		Data:       nil,
 		Msg:        response.OK,
 	}
-
+	var total int64
 	var replies []vo.ReplyVo
-	sql := "select replies.id,replies.created_at,content,uid,users.name,users.avatar,reply_uid,reply_name " +
-		"from replies,users where replies.deleted_at is null and replies.uid = users.id and cid = ?"
+
+	sql := "select comments.id,comments.created_at,content,users.id as uid,name,avatar from comments,users " +
+		"where comments.deleted_at is null and comments.uid = users.id and parent_id = ? limit ? offset ?"
 	DB := common.GetDB()
-	if !IsCommentExist(DB, uint(cid)) {
-		res.HttpStatus = http.StatusBadRequest
-		res.Code = 400
-		res.Msg = "评论不存在或已被删除"
-		return res
+	DB.Model(&model.Comment{}).Where("parent_id = ?", cid).Count(&total)
+	DB.Raw(sql, cid, pageSize, (page-1)*pageSize+offset).Scan(&replies)
+	res.Data = gin.H{
+		"count":   total,
+		"replies": replies,
 	}
-	// DB = DB.Limit(pageSize).Offset((page - 1) * pageSize)
-	// DB.Model(&model.Reply{}).Where("cid = ?", cid)
-	DB.Raw(sql, cid).Scan(&replies)
-	res.Data = gin.H{"replies": replies}
 	return res
 }
 
 func DeleteCommentService(id uint, uid interface{}) response.ResponseStruct {
-	DB := common.GetDB()
-	DB.Where("id = ? and uid = ?", id, uid).Delete(&model.Comment{})
-	return response.ResponseStruct{
+	res := response.ResponseStruct{
 		HttpStatus: http.StatusOK,
 		Code:       http.StatusOK,
 		Data:       nil,
 		Msg:        response.OK,
 	}
-}
-
-func DeleteReplyService(id uint, uid interface{}) response.ResponseStruct {
 	DB := common.GetDB()
-	DB.Where("id = ? and uid = ?", id, uid).Delete(&model.Reply{})
-	return response.ResponseStruct{
-		HttpStatus: http.StatusOK,
-		Code:       http.StatusOK,
-		Data:       nil,
-		Msg:        response.OK,
-	}
-}
-
-func IsCommentExist(db *gorm.DB, cid uint) bool {
 	var comment model.Comment
-	db.Where("id = ?", cid).First(&comment)
+	DB.Where("id = ?", id).First(&comment)
 	if comment.ID != 0 {
-		return true
+		if comment.Uid == uid {
+			DB.Where("id = ? and uid = ?", id, uid).Delete(&comment)
+		}
 	}
-	return false
+
+	return res
 }

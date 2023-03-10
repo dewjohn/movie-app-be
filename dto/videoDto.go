@@ -25,18 +25,19 @@ type ResDto struct {
 }
 
 type ModifyVideoDto struct {
-	Vid          int    `json:"vid"`          // 视频ID
-	Title        string `json:"title"`        // 标题
-	Cover        string `json:"cover"`        // 封面
-	ReleaseTime  string `json:"releaseTime"`  // 上映时间
-	SheetLength  int    `json:"sheetLength"`  // 片长
-	Origin       string `json:"origin"`       // 地区
-	Type         string `json:"type"`         // 类型
-	Director     string `json:"director"`     // 导演
-	Screenwriter string `json:"screenwriter"` // 编剧
-	Actors       string `json:"actors"`       // 演员
-	Language     string `json:"language"`     // 语言
-	Introduction string `json:"introduction"` // 简介
+	Vid          int     `json:"vid"`          // 视频ID
+	Title        string  `json:"title"`        // 标题
+	Cover        string  `json:"cover"`        // 封面
+	ReleaseTime  string  `json:"releaseTime"`  // 上映时间
+	SheetLength  int     `json:"sheetLength"`  // 片长
+	Origin       string  `json:"origin"`       // 地区
+	Type         string  `json:"type"`         // 类型
+	Director     string  `json:"director"`     // 导演
+	Screenwriter string  `json:"screenwriter"` // 编剧
+	Actors       string  `json:"actors"`       // 演员
+	Language     string  `json:"language"`     // 语言
+	Introduction string  `json:"introduction"` // 简介
+	Score        float64 `json:"score"`        // 评分
 }
 
 type VideoIdDto struct {
@@ -50,4 +51,9 @@ type UUID struct {
 type GetMovieListDto struct {
 	Page     int
 	PageSize int
+}
+
+type ScoreDto struct {
+	Vid   uint    `json:"vid"`
+	Grade float64 `json:"grade"`
 }

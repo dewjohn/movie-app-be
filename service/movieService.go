@@ -62,6 +62,7 @@ func ModifyVideoInfoService(video dto.ModifyVideoDto, tReleaseTime time.Time) re
 			"actors":       video.Actors,
 			"language":     video.Language,
 			"introduction": video.Introduction,
+			"score":        video.Score,
 		}).Error
 	if err != nil {
 		res.HttpStatus = http.StatusInternalServerError

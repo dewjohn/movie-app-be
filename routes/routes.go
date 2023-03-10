@@ -18,18 +18,8 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 		GetUserRoutes(v1)
 		GetAdminRoutes(v1)
 		GetMovieRoutes(v1)
+		GetCommentRoutes(v1)
 
-		// 评论
-		v1.GET("comment/get", controller.GetComment)
-		v1.GET("comment/reply", controller.GetReplyDetails)
-		comment := v1.Group("/comment")
-		comment.Use(middleWare.UserAuthMiddleWare())
-		{
-			comment.POST("", controller.Comment)                  // 评论
-			comment.POST("/delete", controller.DeleteComment)     // 删除评论
-			comment.POST("/reply", controller.Reply)              // 回复
-			comment.POST("/reply/delete", controller.DeleteReply) // 删除回复
-		}
 		// 用户文件上传相关
 		userFile := v1.Group("/upload")
 		userFile.Use(middleWare.UserAuthMiddleWare())
