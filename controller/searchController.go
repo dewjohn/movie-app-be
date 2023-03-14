@@ -10,7 +10,7 @@ import (
 func SerchMovie(ctx *gin.Context) {
 	search := ctx.Query("keywords")
 	if len(search) == 0 {
-		response.CheckFail(ctx, nil, "搜索内容不能为空")
+		response.CheckFail(ctx, nil, response.SearchNotEmpty)
 		return
 	}
 	keywords := "%" + strings.Replace(search, " ", "%", -1) + "%"

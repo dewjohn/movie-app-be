@@ -36,7 +36,7 @@ func UploadVideoService(urls dto.ResDto, vid int) response.ResponseStruct {
 	if movie.ID == 0 {
 		res.HttpStatus = http.StatusBadRequest
 		res.Code = 400
-		res.Msg = "视频不存在"
+		res.Msg = response.MovieNotExit
 	}
 	tx := DB.Begin()
 	var err error
@@ -49,7 +49,7 @@ func UploadVideoService(urls dto.ResDto, vid int) response.ResponseStruct {
 		tx.Rollback()
 		res.HttpStatus = http.StatusBadRequest
 		res.Code = 400
-		res.Msg = "文件上传失败"
+		res.Msg = response.FailUploadFile
 		return res
 	}
 	tx.Commit()

@@ -104,12 +104,32 @@ func GetMovieByIdService(vid int) response.ResponseStruct {
 	if movie.ID == 0 {
 		res.HttpStatus = http.StatusBadRequest
 		res.Code = http.StatusBadRequest
-		res.Msg = "视频不存在"
+		res.Msg = response.MovieNotExit
 		return res
 	}
 	// 获取当前视频的resource
 	resource := GetVideoResource(DB, uint(vid))
 	res.Data = gin.H{"movie": vo.ToVideo(movie, resource)}
+	return res
+}
+
+func GetHighScoreMovieService(query dto.GetMovieListDto) response.ResponseStruct {
+	res := response.ResponseStruct{
+		HttpStatus: http.StatusOK,
+		Code:       200,
+		Data:       nil,
+		Msg:        response.OK,
+	}
+	DB := common.GetDB()
+	var total int64 // 记录总数
+	var movies []vo.SearchMovieVo
+	Pagination := DB.Limit(query.PageSize).Offset((query.Page - 1) * query.PageSize)
+	Pagination.Model(&model.Movie{}).Select("id, title, cover, release_time, score").Where("score > 9.0").Scan(&movies).Count(&total)
+
+	res.Data = gin.H{
+		"count":  total,
+		"movies": movies,
+	}
 	return res
 }
 

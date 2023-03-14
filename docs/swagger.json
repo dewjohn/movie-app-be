@@ -22,36 +22,28 @@
                         "schema": {
                             "type": "string"
                         }
-                    },
-                    {
-                        "description": "邮箱",
-                        "name": "email",
-                        "in": "body",
-                        "required": true,
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "请求成功",
                         "schema": {
                             "type": "string"
                         }
                     },
-                    {
-                        "description": "电话",
-                        "name": "telephone",
-                        "in": "body",
-                        "required": true,
+                    "400": {
+                        "description": "请求错误",
                         "schema": {
                             "type": "string"
                         }
                     },
-                    {
-                        "description": "密码",
-                        "name": "password",
-                        "in": "body",
-                        "required": true,
+                    "500": {
+                        "description": "内部错误",
                         "schema": {
                             "type": "string"
                         }
                     }
-                ],
-                "responses": {}
+                }
             }
         }
     }

@@ -21,7 +21,7 @@ func CommentService(comment dto.CommentDto, uid interface{}) response.ResponseSt
 	if !IsMovieExit(DB, comment.Vid) {
 		res.HttpStatus = http.StatusBadRequest
 		res.Code = 400
-		res.Msg = "视频不存在"
+		res.Msg = response.MovieNotExit
 		return res
 	}
 	newComment := model.Comment{

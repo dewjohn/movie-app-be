@@ -12,14 +12,14 @@ func Comment(ctx *gin.Context) {
 	var comment dto.CommentDto
 	err := ctx.Bind(&comment)
 	if err != nil {
-		response.Fail(ctx, nil, "请求错误")
+		response.Fail(ctx, nil, response.RequestError)
 		return
 	}
 	content := comment.Content
 	uid, _ := ctx.Get("userId")
 
 	if len(content) == 0 {
-		response.CheckFail(ctx, nil, "评论或回复内容不能为空")
+		response.CheckFail(ctx, nil, response.CommentOrReplyError)
 		return
 	}
 	res := service.CommentService(comment, uid)
@@ -48,7 +48,7 @@ func GetCommentList(ctx *gin.Context) {
 	vid := utils.StringToInt(ctx.Query("vid"))
 
 	if page <= 0 || pageSize <= 0 || pageSize > 15 {
-		response.CheckFail(ctx, nil, "页码或请求数量错误")
+		response.CheckFail(ctx, nil, response.PageError)
 		return
 	}
 
@@ -63,11 +63,11 @@ func GetReplyDetails(ctx *gin.Context) {
 	offset := utils.StringToInt(ctx.DefaultQuery("offset", "0"))
 
 	if cid <= 0 {
-		response.CheckFail(ctx, nil, "参数错误")
+		response.CheckFail(ctx, nil, response.ParameterError)
 		return
 	}
 	if page <= 0 || pageSize <= 0 || pageSize > 15 {
-		response.CheckFail(ctx, nil, "页码或请求数量错误")
+		response.CheckFail(ctx, nil, response.PageError)
 		return
 	}
 
@@ -79,7 +79,7 @@ func DeleteComment(ctx *gin.Context) {
 	var request dto.CommentIdDto
 	err := ctx.Bind(&request)
 	if err != nil {
-		response.CheckFail(ctx, nil, "请求错误")
+		response.CheckFail(ctx, nil, response.RequestError)
 		return
 	}
 	id := request.ID
