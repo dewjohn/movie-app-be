@@ -3,6 +3,8 @@ package utils
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
+	"gorm.io/gorm"
+	"movie-app/model"
 	"movie-app/response"
 )
 
@@ -48,6 +50,15 @@ func verifyMovieInfo(ctx *gin.Context, Title string, Cover string, SheetLength i
 		response.CheckFail(ctx, nil, "视频简介不能为空")
 		return
 	}
+}
+
+func IsCollected(db *gorm.DB, vid int, uid uint) bool {
+	var collect model.Collect
+	db.Where("vid = ? and uid = ?", vid, uid).First(&collect)
+	if collect.ID != 0 {
+		return true
+	}
+	return false
 }
 
 func GetUrl() string {

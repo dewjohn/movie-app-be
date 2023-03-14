@@ -5,10 +5,10 @@ type CollectDto struct {
 }
 
 type CollectMovieDto struct {
-	Title       string `json:"title"`
-	Cover       string `json:"cover"`
-	ReleaseTime string `json:"releaseTime"`
-	Score       string `json:"score"`
+	Title       string  `json:"title"`
+	Cover       string  `json:"cover"`
+	ReleaseTime string  `json:"releaseTime"`
+	Score       float64 `json:"score"`
 }
 
 type CollectResDto struct {
