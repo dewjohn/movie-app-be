@@ -53,6 +53,13 @@ type GetMovieListDto struct {
 	PageSize int
 }
 
+type FilterMovieDto struct {
+	Page     int
+	PageSize int
+	Category string
+	Types    string
+}
+
 type ScoreDto struct {
 	Vid   uint    `json:"vid"`
 	Grade float64 `json:"grade"`

@@ -35,17 +35,20 @@ func CollectService(vid int, uid interface{}) response.ResponseStruct {
 
 func DeleteCollectService(vid int, uid interface{}) response.ResponseStruct {
 	res := response.ResponseStruct{
-		HttpStatus: http.StatusOK,
-		Code:       200,
+		HttpStatus: http.StatusUnprocessableEntity,
+		Code:       400,
 		Data:       nil,
-		Msg:        response.OK,
+		Msg:        "请求数据为空",
 	}
 	DB := common.GetDB()
 	var collect model.Collect
-	DB.Where("vid = ? and uid = ?", vid, uid).First(&collect)
+	DB.Where("deleted_at = null and vid = ? and uid = ?", vid, uid).First(&collect)
 	if collect.ID != 0 {
 		if collect.Uid == uid {
-			DB.Where("vid = ? and uid = ?", vid, uid).Delete(&collect)
+			DB.Where("deleted_at = null vid = ? and uid = ?", vid, uid).Delete(&collect)
+			res.HttpStatus = http.StatusOK
+			res.Code = 200
+			res.Msg = response.OK
 		}
 	}
 	return res

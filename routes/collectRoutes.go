@@ -12,7 +12,7 @@ func GetCollectRoutes(route *gin.RouterGroup) {
 	{
 		collectAuth.POST("/add", controller.Collect)
 		collectAuth.GET("/get", controller.GetCollectList)
-		collectAuth.GET("/is", controller.IsCollected)       // 是否收藏
+		collectAuth.GET("/judge", controller.IsCollected)    // 是否收藏
 		collectAuth.PUT("/delete", controller.DeleteCollect) // 取消收藏
 	}
 }
