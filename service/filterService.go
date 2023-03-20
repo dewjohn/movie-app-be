@@ -23,11 +23,11 @@ func FilterService(request dto.FilterMovieDto) response.ResponseStruct {
 	var movie []vo.SearchMovieVo
 	Pagination := DB.Limit(request.PageSize).Offset((request.Page - 1) * request.PageSize)
 
-	search := fmt.Sprintf("%s like ?", request.Category)
+	search := fmt.Sprintf("%s like ?", request.Column)
 
 	Pagination.Model(&model.Movie{}).
 		Select("id, title, cover, release_time, score").
-		Where(search, request.Types).Scan(&movie).Count(&total)
+		Where(search, request.Value).Scan(&movie).Count(&total)
 
 	res.Data = gin.H{"count": total, "movies": movie}
 

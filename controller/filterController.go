@@ -13,8 +13,8 @@ func FilterMovie(ctx *gin.Context) {
 	var request dto.FilterMovieDto
 	request.Page, _ = strconv.Atoi(ctx.Query("page"))
 	request.PageSize, _ = strconv.Atoi(ctx.Query("page_size"))
-	request.Category = ctx.Query("category")
-	request.Types = ctx.Query("types")
+	request.Column = ctx.Query("column")
+	request.Value = ctx.Query("value")
 
 	if request.Page <= 0 || request.PageSize <= 0 {
 		response.Fail(ctx, nil, response.PageError)
@@ -25,8 +25,8 @@ func FilterMovie(ctx *gin.Context) {
 		return
 	}
 
-	tips := fmt.Sprintf("电影%s不能为空", request.Category)
-	if len(request.Types) == 0 {
+	tips := fmt.Sprintf("电影%s不能为空", request.Column)
+	if len(request.Value) == 0 {
 		response.CheckFail(ctx, nil, tips)
 		return
 	}

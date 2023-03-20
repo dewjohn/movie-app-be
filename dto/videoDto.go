@@ -56,8 +56,8 @@ type GetMovieListDto struct {
 type FilterMovieDto struct {
 	Page     int
 	PageSize int
-	Category string
-	Types    string
+	Column   string
+	Value    string
 }
 
 type ScoreDto struct {
