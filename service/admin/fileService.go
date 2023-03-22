@@ -23,7 +23,7 @@ func UploadCoverService(objectName string) response.ResponseStruct {
 	return res
 }
 
-func UploadVideoService(urls dto.ResDto, vid int) response.ResponseStruct {
+func UploadVideoService(urls dto.ResDto, vid int, videoTitle string) response.ResponseStruct {
 	res := response.ResponseStruct{
 		HttpStatus: http.StatusOK,
 		Code:       200,
@@ -42,6 +42,7 @@ func UploadVideoService(urls dto.ResDto, vid int) response.ResponseStruct {
 	var err error
 	var newResource model.Resource
 	newResource.Vid = uint(vid)
+	newResource.Title = videoTitle
 	newResource.Original = urls.Original // 原始分辨率
 
 	// 创建新的资源

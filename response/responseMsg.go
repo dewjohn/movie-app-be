@@ -12,6 +12,8 @@ const (
 	MailTypeError       = "邮箱格式错误"
 	PasswordNumberError = "密码至少6位"
 
+	AuthorityError = "权限设置错误"
+
 	NameError  = "昵称不能为空"
 	TitleError = "标题不能为空"
 	CoverError = "请上传封面图片"

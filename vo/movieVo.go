@@ -28,6 +28,8 @@ type MovieVo struct {
 	Introduction string       `json:"introduction"` // 简介
 	Score        float64      `json:"score"`        // 评分
 	Resource     []ResourceVo `json:"resource"`     // 视频
+	CreatedAt    string       `json:"created_at"`
+	UpdatedAt    string       `json:"updated_at"`
 }
 
 func ToVideo(movie model.Movie, resource []model.Resource) MovieVo {
@@ -57,4 +59,18 @@ func ToVideo(movie model.Movie, resource []model.Resource) MovieVo {
 		Score:        movie.Score,
 		Resource:     newResource,
 	}
+}
+
+func ToResource(resource []model.Resource) []ResourceVo {
+	length := len(resource)
+	newResource := make([]ResourceVo, length)
+	for i := 0; i < length; i++ {
+		newResource[i].ID = resource[i].UUID
+		newResource[i].Title = resource[i].Title
+		newResource[i].Res360 = resource[i].Res360
+		newResource[i].Res720 = resource[i].Res720
+		newResource[i].Res1080 = resource[i].Res1080
+		newResource[i].Original = resource[i].Original
+	}
+	return newResource
 }

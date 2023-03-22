@@ -3,9 +3,11 @@ package admin
 import (
 	"github.com/gin-gonic/gin"
 	"movie-app/dto"
+	"movie-app/model"
 	"movie-app/response"
 	"movie-app/service/admin"
 	"movie-app/utils"
+	"movie-app/vo"
 	"net/http"
 )
 
@@ -20,7 +22,7 @@ func AdminLogin(ctx *gin.Context) {
 	var requestAdmin = dto.AdminLoginDto{}
 	err := ctx.Bind(&requestAdmin)
 	if err != nil {
-		response.Response(ctx, http.StatusBadRequest, 400, nil, "请求失败")
+		response.Response(ctx, http.StatusBadRequest, 400, nil, response.RequestError)
 		return
 	}
 	telephone := requestAdmin.Telephone
@@ -28,15 +30,20 @@ func AdminLogin(ctx *gin.Context) {
 
 	// 验证数据
 	if len(telephone) != 11 {
-		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "手机号必须为11位")
+		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, response.PhoneNumberError)
 		return
 	}
 	if len(password) < 6 {
-		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "密码至少6位")
+		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, response.PasswordNumberError)
 		return
 	}
 	res := admin.AdminLoginService(requestAdmin)
 	response.HandleResponse(ctx, res)
+}
+
+func AdminInfo(ctx *gin.Context) {
+	adminInfo, _ := ctx.Get("admin")
+	response.Response(ctx, http.StatusOK, 200, gin.H{"admin": vo.ToAdminVo(adminInfo.(model.Admin))}, response.OK)
 }
 
 // 增加管理员
@@ -44,7 +51,7 @@ func AddAdmin(ctx *gin.Context) {
 	var requestAdmin = dto.AddAdminDto{}
 	err := ctx.Bind(&requestAdmin)
 	if err != nil {
-		response.Response(ctx, http.StatusBadRequest, 400, nil, "请求失败")
+		response.Response(ctx, http.StatusBadRequest, 400, nil, response.RequestError)
 		return
 	}
 	name := requestAdmin.Name
@@ -55,19 +62,19 @@ func AddAdmin(ctx *gin.Context) {
 
 	// 验证数据
 	if len(telephone) != 11 {
-		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "手机号必须为11位")
+		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, response.PhoneNumberError)
 		return
 	}
 	if !utils.VerifyEmailFormat(email) {
-		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "邮箱格式错误")
+		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, response.MailTypeError)
 		return
 	}
 	if len(password) < 6 {
-		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "密码至少6位")
+		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, response.PasswordNumberError)
 		return
 	}
 	if authority != Admin && authority != Auditor {
-		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "权限选择错误")
+		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, response.AuthorityError)
 		return
 	}
 	// 如果名称没有传，随机字符串

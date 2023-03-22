@@ -6,11 +6,13 @@ import (
 	"movie-app/response"
 	"movie-app/service"
 	"movie-app/service/admin"
+	"movie-app/utils"
+	"strconv"
 	"time"
 )
 
 func UploadVideoInfo(ctx *gin.Context) {
-	var video dto.VideoDto
+	var video dto.MovieDto
 	err := ctx.Bind(&video)
 	if err != nil {
 		response.Fail(ctx, nil, "请求错误")
@@ -80,13 +82,14 @@ func UploadVideoInfo(ctx *gin.Context) {
 }
 
 // 修改视频信息
-func ModifyVideoInfo(ctx *gin.Context) {
-	var video = dto.ModifyVideoDto{}
+func ModifyMovieInfo(ctx *gin.Context) {
+	vid := utils.StringToInt(ctx.Query("vid"))
+	var video = dto.ModifyMovieDto{}
 	err := ctx.Bind(&video)
 	if err != nil {
 		response.Fail(ctx, nil, "请求错误")
 	}
-	Vid := video.Vid
+	Vid := vid
 	Title := video.Title
 	Cover := video.Cover // 通过 api/v1/upload/cover 接口返回 cover string
 	ReleaseTime := video.ReleaseTime
@@ -149,7 +152,7 @@ func ModifyVideoInfo(ctx *gin.Context) {
 		response.CheckFail(ctx, nil, "视频简介不能为空")
 		return
 	}
-	res := service.ModifyVideoInfoService(video, tReleaseTime)
+	res := service.ModifyMovieInfoService(vid, video, tReleaseTime)
 	response.HandleResponse(ctx, res)
 }
 
@@ -167,5 +170,21 @@ func DeleteMovieVideo(ctx *gin.Context) {
 		return
 	}
 	res := admin.DeleteMovieVideoService(id)
+	response.HandleResponse(ctx, res)
+}
+
+func GetMovieDataList(ctx *gin.Context) {
+	var query dto.GetMovieListDto
+	query.Page, _ = strconv.Atoi(ctx.Query("page"))
+	query.PageSize, _ = strconv.Atoi(ctx.Query("page_size"))
+	if query.Page <= 0 || query.PageSize <= 0 {
+		response.Fail(ctx, nil, response.PageError)
+		return
+	}
+	if query.PageSize >= 30 {
+		response.Fail(ctx, nil, response.RequestTooMany)
+		return
+	}
+	res := admin.GetMovieDataListService(query)
 	response.HandleResponse(ctx, res)
 }

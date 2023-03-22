@@ -18,8 +18,8 @@ func GetUserRoutes(route *gin.RouterGroup) {
 		{
 
 			userAuth.GET("/info", controller.UserInfo)
-			userAuth.POST("/info/modify", controller.UserModify)
-			userAuth.POST("/info/password", controller.UserModifyPassword)
+			userAuth.PUT("/info/modify", controller.UserModify)
+			userAuth.PUT("/info/password", controller.UserModifyPassword)
 		}
 	}
 }

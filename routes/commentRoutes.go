@@ -14,8 +14,8 @@ func GetCommentRoutes(route *gin.RouterGroup) {
 		userAuth := comment.Group("/")
 		userAuth.Use(middleWare.UserAuthMiddleWare())
 		{
-			userAuth.POST("/add", controller.Comment)          // 写评论
-			userAuth.POST("/delete", controller.DeleteComment) // 删除评论
+			userAuth.POST("/add", controller.Comment)         // 写评论
+			userAuth.PUT("/delete", controller.DeleteComment) // 删除评论
 		}
 	}
 }

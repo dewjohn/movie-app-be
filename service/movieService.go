@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-func UploadVideoInfoService(video dto.VideoDto, adminId interface{}, tReleaseTime time.Time) response.ResponseStruct {
+func UploadVideoInfoService(video dto.MovieDto, adminId interface{}, tReleaseTime time.Time) response.ResponseStruct {
 	res := response.ResponseStruct{
 		HttpStatus: http.StatusOK,
 		Code:       200,
@@ -40,7 +40,7 @@ func UploadVideoInfoService(video dto.VideoDto, adminId interface{}, tReleaseTim
 	return res
 }
 
-func ModifyVideoInfoService(video dto.ModifyVideoDto, tReleaseTime time.Time) response.ResponseStruct {
+func ModifyMovieInfoService(vid int, video dto.ModifyMovieDto, tReleaseTime time.Time) response.ResponseStruct {
 	res := response.ResponseStruct{
 		HttpStatus: http.StatusOK,
 		Code:       200,
@@ -49,7 +49,7 @@ func ModifyVideoInfoService(video dto.ModifyVideoDto, tReleaseTime time.Time) re
 	}
 
 	DB := common.GetDB()
-	err := DB.Model(&model.Movie{}).Where("id = ?", video.Vid).Updates(
+	err := DB.Model(&model.Movie{}).Where("id = ?", vid).Updates(
 		map[string]interface{}{
 			"title":        video.Title,
 			"cover":        video.Cover,
@@ -84,7 +84,7 @@ func GetMovieListService(query dto.GetMovieListDto) response.ResponseStruct {
 	var movie []vo.SearchMovieVo
 	Pagination := DB.Limit(query.PageSize).Offset((query.Page - 1) * query.PageSize)
 
-	Pagination.Model(&model.Movie{}).Select("id, title, cover, release_time, score").Scan(&movie).Count(&total)
+	Pagination.Model(&model.Movie{}).Select("id, title, cover, release_time, score").Order("created_at desc").Scan(&movie).Count(&total)
 
 	res.Data = gin.H{"count": total, "movies": movie}
 

@@ -60,14 +60,15 @@ func UploadMovieVideo(ctx *gin.Context) {
 		response.Fail(ctx, nil, "文件上传失败")
 		return
 	}
-	suffix := path.Ext(video.Filename)
+	videoTitle := path.Base(video.Filename) // 视频名
+	suffix := path.Ext(video.Filename)      // 视频后缀
 	if suffix != ".mp4" {
 		response.CheckFail(ctx, nil, "文件格式不符合要求")
 		return
 	}
 	// 生成自定义文件名
-	videoName := utils.RandomString(3) + strconv.FormatInt(time.Now().UnixNano(), 10)
-	video.Filename = videoName + suffix
+	reVideoName := utils.RandomString(3) + strconv.FormatInt(time.Now().UnixNano(), 10)
+	video.Filename = reVideoName + suffix
 
 	// 如果没有指定文件夹创建
 	if _, err := os.Stat("./files/movie"); os.IsNotExist(err) {
@@ -95,7 +96,7 @@ func UploadMovieVideo(ctx *gin.Context) {
 	var urls dto.ResDto
 	urls.Original = utils.GetUrl() + "/api/" + objectName
 
-	res := admin.UploadVideoService(urls, vid)
+	res := admin.UploadVideoService(urls, vid, videoTitle)
 	response.HandleResponse(ctx, res)
 }
 

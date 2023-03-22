@@ -2,7 +2,7 @@ package dto
 
 import "github.com/google/uuid"
 
-type VideoDto struct {
+type MovieDto struct {
 	Title        string `json:"title"`        // 标题
 	Cover        string `json:"cover"`        // 封面
 	ReleaseTime  string `json:"releaseTime"`  // 上映时间
@@ -16,6 +16,12 @@ type VideoDto struct {
 	Introduction string `json:"introduction"` // 简介
 }
 
+type MovieToAdminDto struct {
+	MovieDto
+	CreatedAt string `json:"created_at"`
+	UpdatedAt string `json:"updated_at"`
+}
+
 type ResDto struct {
 	Res360   string
 	Res480   string
@@ -24,8 +30,7 @@ type ResDto struct {
 	Original string
 }
 
-type ModifyVideoDto struct {
-	Vid          int     `json:"vid"`          // 视频ID
+type ModifyMovieDto struct {
 	Title        string  `json:"title"`        // 标题
 	Cover        string  `json:"cover"`        // 封面
 	ReleaseTime  string  `json:"releaseTime"`  // 上映时间
