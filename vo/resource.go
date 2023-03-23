@@ -3,7 +3,9 @@ package vo
 import "github.com/google/uuid"
 
 type ResourceVo struct {
-	ID uuid.UUID `json:"id"`
+	UUID uuid.UUID `json:"uuid"`
+
+	Vid uint `json:"vid"`
 	//分P使用的标题
 	Title string `json:"title"`
 	//不同分辨率

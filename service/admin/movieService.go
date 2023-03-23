@@ -32,16 +32,39 @@ func GetMovieDataListService(query dto.GetMovieListDto) response.ResponseStruct 
 	}
 	DB := common.GetDB()
 	var total int64 // 记录总数
-	var movie []vo.MovieVo
+	var movie []model.Movie
 	Pagination := DB.Limit(query.PageSize).Offset((query.Page - 1) * query.PageSize)
 
 	Pagination.Model(&model.Movie{}).Order("created_at desc").Scan(&movie).Count(&total)
 	// 获取当前视频的resource
 	for i := 0; i < len(movie); i++ {
 		resource := service.GetVideoResource(DB, uint(movie[i].ID))
-		movie[i].Resource = vo.ToResource(resource)
+		movie[i].Videos = vo.ToResource(resource)
 	}
-	res.Data = gin.H{"count": total, "movies": movie}
+	res.Data = gin.H{"count": total, "movies": vo.ToAdminMovie(movie)}
 
+	return res
+}
+
+func GetMovieByVidService(vid int) response.ResponseStruct {
+	res := response.ResponseStruct{
+		HttpStatus: http.StatusOK,
+		Code:       http.StatusOK,
+		Data:       nil,
+		Msg:        response.OK,
+	}
+	var movie model.Movie
+	DB := common.GetDB()
+	DB.Model(&model.Movie{}).Where("id = ?", vid).First(&movie)
+	if movie.ID == 0 {
+		res.HttpStatus = http.StatusBadRequest
+		res.Code = http.StatusBadRequest
+		res.Msg = response.MovieNotExit
+		return res
+	}
+	// 获取当前视频的resource
+	resource := service.GetVideoResource(DB, uint(vid))
+	movie.Videos = resource
+	res.Data = gin.H{"movie": vo.ToAdminMovieById(movie)}
 	return res
 }

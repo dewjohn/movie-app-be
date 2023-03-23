@@ -10,7 +10,7 @@ type Resource struct {
 	// 资源标识
 	UUID uuid.UUID `gorm:"char(36);not null;"`
 	// 所属视频
-	Vid uint
+	Vid uint `gorm:"char(36);not null;"`
 	//分P使用的标题
 	Title string `gorm:"varchar(20);"`
 	//不同分辨率

@@ -22,6 +22,7 @@ func GetAdminRoutes(route *gin.RouterGroup) {
 			adminAuth.PUT("/movie/delete/intro", admin2.DeleteMovieVideo) // 管理员删除电影信息
 			adminAuth.PUT("/movie/delete/video", admin2.DeleteResource)   // 管理员删除电影视频
 			adminAuth.GET("/movie/get", admin2.GetMovieDataList)          // 管理员获取电影所有信息
+			adminAuth.GET("/movie/id", admin2.GetMovieByVid)              // 管理员获取指定Id电影所有信息
 		}
 	}
 }

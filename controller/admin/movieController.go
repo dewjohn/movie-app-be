@@ -188,3 +188,13 @@ func GetMovieDataList(ctx *gin.Context) {
 	res := admin.GetMovieDataListService(query)
 	response.HandleResponse(ctx, res)
 }
+
+func GetMovieByVid(ctx *gin.Context) {
+	vid := utils.StringToInt(ctx.Query("vid"))
+	if vid <= 0 {
+		response.CheckFail(ctx, nil, response.MovieNotExit)
+		return
+	}
+	res := admin.GetMovieByVidService(vid)
+	response.HandleResponse(ctx, res)
+}
