@@ -60,8 +60,10 @@ func UploadMovieVideo(ctx *gin.Context) {
 		response.Fail(ctx, nil, "文件上传失败")
 		return
 	}
-	videoTitle := path.Base(video.Filename) // 视频名
-	suffix := path.Ext(video.Filename)      // 视频后缀
+	suffix := path.Ext(video.Filename)                              // 视频后缀
+	videoTitle := path.Base(video.Filename)                         // 视频名
+	videoTitlePrefix := videoTitle[0 : len(videoTitle)-len(suffix)] // 视频名前缀
+
 	if suffix != ".mp4" {
 		response.CheckFail(ctx, nil, "文件格式不符合要求")
 		return
@@ -96,7 +98,7 @@ func UploadMovieVideo(ctx *gin.Context) {
 	var urls dto.ResDto
 	urls.Original = utils.GetUrl() + "/api/" + objectName
 
-	res := admin.UploadVideoService(urls, vid, videoTitle)
+	res := admin.UploadVideoService(urls, vid, videoTitlePrefix)
 	response.HandleResponse(ctx, res)
 }
 
