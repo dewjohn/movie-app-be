@@ -33,6 +33,7 @@ func UploadVideoInfoService(video dto.MovieDto, adminId interface{}, tReleaseTim
 		Actors:       video.Actors,
 		Language:     video.Language,
 		Introduction: video.Introduction,
+		Score:        video.Score,
 	}
 	DB := common.GetDB()
 	DB.Create(&newVideo)

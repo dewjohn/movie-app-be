@@ -13,6 +13,7 @@ import (
 )
 
 func UploadMovieCover(ctx *gin.Context) {
+	vid := utils.StringToInt(ctx.Query("vid"))
 	cover, err := ctx.FormFile("cover")
 	if err != nil {
 		response.Fail(ctx, nil, "封面上传失败")
@@ -45,7 +46,7 @@ func UploadMovieCover(ctx *gin.Context) {
 	}
 	// 拼接上传图片的路径信息
 	objectName := "cover/" + cover.Filename
-	res := admin.UploadCoverService(objectName)
+	res := admin.UploadCoverService(objectName, vid)
 	response.HandleResponse(ctx, res)
 }
 

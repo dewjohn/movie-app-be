@@ -11,7 +11,7 @@ import (
 	"net/http"
 )
 
-func UploadCoverService(objectName string) response.ResponseStruct {
+func UploadCoverService(objectName string, vid int) response.ResponseStruct {
 	res := response.ResponseStruct{
 		HttpStatus: http.StatusOK,
 		Code:       200,
@@ -19,6 +19,23 @@ func UploadCoverService(objectName string) response.ResponseStruct {
 		Msg:        response.OK,
 	}
 	url := utils.GetUrl() + objectName
+	if vid != 0 {
+		var movie model.Movie
+		DB := common.GetDB()
+		DB.Where("id = ?", vid).First(&movie)
+		if movie.ID == 0 {
+			res.HttpStatus = http.StatusBadRequest
+			res.Code = 400
+			res.Msg = response.MovieNotExit
+			return res
+		}
+		err := DB.Model(&model.Movie{}).Where("id = ?", vid).Update("cover", url).Error
+		if err != nil {
+			res.HttpStatus = http.StatusInternalServerError
+			res.Code = 500
+			res.Msg = response.SystemError
+		}
+	}
 	res.Data = gin.H{"url": url}
 	return res
 }
