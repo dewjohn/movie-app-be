@@ -25,7 +25,7 @@ func ReviewMovieScore(ctx *gin.Context) {
 		return
 	}
 	if grade > 10.0 || grade < 0 {
-		response.CheckFail(ctx, nil, "分数范围为1-10分")
+		response.CheckFail(ctx, nil, response.ReviewScoreError)
 		return
 	}
 	res := service.ReviewMovieScoreService(request, uid)

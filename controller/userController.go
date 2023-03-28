@@ -13,6 +13,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// @Summary 用户注册
+// @Param telephone body string true "手机号码"
+// @Param password body string true "密码"
+// @Router /api/vi/user/register [post]
+// @Success 200 {string} string "成功"
+// @Failure 400 {string} string "请求错误"
+// @Failure 500 {string} string "系统错误"
 func Register(ctx *gin.Context) {
 	// 获取参数
 	var requestUser = dto.RegisterDto{}

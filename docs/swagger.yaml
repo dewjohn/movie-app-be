@@ -1,20 +1,24 @@
 info:
   contact: {}
 paths:
-  /api/v1/user/register:
+  /api/vi/user/register:
     post:
       parameters:
-      - description: 姓名
+      - description: 手机号码
         in: body
-        name: name
+        name: telephone
         required: true
         schema:
           type: string
-      produces:
-      - application/json
+      - description: 密码
+        in: body
+        name: password
+        required: true
+        schema:
+          type: string
       responses:
         "200":
-          description: 请求成功
+          description: 成功
           schema:
             type: string
         "400":
@@ -22,10 +26,8 @@ paths:
           schema:
             type: string
         "500":
-          description: 内部错误
+          description: 系统错误
           schema:
             type: string
       summary: 用户注册
-      tags:
-      - User
 swagger: "2.0"

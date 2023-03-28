@@ -4,6 +4,9 @@
 # 配置文件
 /config/application.yml
 
+# Swagger
+/docs
+
 # 静态资源
 /files/avatar
 /files/cover

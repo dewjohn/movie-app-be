@@ -10,7 +10,7 @@ import (
 func Collect(ctx *gin.Context) {
 	vid := utils.StringToInt(ctx.Query("vid"))
 	if vid <= 0 {
-		response.CheckFail(ctx, nil, "电影不存在")
+		response.CheckFail(ctx, nil, response.MovieNotExit)
 		return
 	}
 	uid, _ := ctx.Get("userId")
@@ -21,7 +21,7 @@ func Collect(ctx *gin.Context) {
 func DeleteCollect(ctx *gin.Context) {
 	vid := utils.StringToInt(ctx.Query("vid"))
 	if vid <= 0 {
-		response.CheckFail(ctx, nil, "电影不存在")
+		response.CheckFail(ctx, nil, response.MovieNotExit)
 		return
 	}
 	uid, _ := ctx.Get("userId")

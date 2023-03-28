@@ -38,4 +38,14 @@ const (
 	RequestTooMany = "请求数量过多"
 
 	SearchNotEmpty = "搜索内容不能为空"
+
+	ReviewScoreError = "打分范围为1-10分"
+
+	MovieCoverError = "电影封面上传失败"
+
+	FileTypeError = "文件格式错误"
+
+	FileSaveError = "文件保存失败"
+
+	FileSizeError = "文件大小不符合要求"
 )

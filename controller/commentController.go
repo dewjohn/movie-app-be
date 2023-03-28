@@ -33,7 +33,7 @@ func GetCommentAndReply(ctx *gin.Context) {
 	replyCount := utils.StringToInt(ctx.DefaultQuery("reply", "0"))
 
 	if page <= 0 || pageSize <= 0 || replyCount > 15 || pageSize > 15 {
-		response.CheckFail(ctx, nil, "页码或请求数量错误")
+		response.CheckFail(ctx, nil, response.PageError)
 		return
 	}
 

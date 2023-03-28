@@ -16,11 +16,12 @@ func UploadMovieCover(ctx *gin.Context) {
 	vid := utils.StringToInt(ctx.Query("vid"))
 	cover, err := ctx.FormFile("cover")
 	if err != nil {
-		response.Fail(ctx, nil, "封面上传失败")
+		response.Fail(ctx, nil, response.MovieCoverError)
+		return
 	}
 	suffix := path.Ext(cover.Filename) // 获取文件的扩展名
 	if suffix != ".jpg" && suffix != ".png" && suffix != ".webp" && suffix != ".jpeg" {
-		response.CheckFail(ctx, nil, "图片不符合要求")
+		response.CheckFail(ctx, nil, response.ImageTypeError)
 	}
 	cover.Filename = utils.RandomString(3) + strconv.FormatInt(time.Now().UnixNano(), 10) + suffix // 重定义封面命名
 	// 如果不存在cover文件夹创建
@@ -34,14 +35,14 @@ func UploadMovieCover(ctx *gin.Context) {
 	dst := path.Join("./files/cover", cover.Filename)
 	errSave := ctx.SaveUploadedFile(cover, dst)
 	if errSave != nil {
-		response.Fail(ctx, nil, "图片保存失败")
+		response.Fail(ctx, nil, response.SaveImageError)
 		return
 	}
 	// 获取文件属性
 	fileInfo, err := os.Stat("./files/cover/" + cover.Filename)
 	//大小限制到5M
 	if fileInfo == nil || fileInfo.Size() > 1024*1024*5 || err != nil {
-		response.CheckFail(ctx, nil, "图片不符合要求")
+		response.CheckFail(ctx, nil, response.ImageTypeError)
 		return
 	}
 	// 拼接上传图片的路径信息
@@ -53,12 +54,12 @@ func UploadMovieCover(ctx *gin.Context) {
 func UploadMovieVideo(ctx *gin.Context) {
 	vid, _ := strconv.Atoi(ctx.PostForm("vid")) // 从上传视频信息返回值中拿到生成的vid
 	if vid < 0 {
-		response.Fail(ctx, nil, "参数错误")
+		response.Fail(ctx, nil, response.ParameterError)
 		return
 	}
 	video, err := ctx.FormFile("video")
 	if err != nil {
-		response.Fail(ctx, nil, "文件上传失败")
+		response.Fail(ctx, nil, response.FailUploadImage)
 		return
 	}
 	suffix := path.Ext(video.Filename)                              // 视频后缀
@@ -66,7 +67,7 @@ func UploadMovieVideo(ctx *gin.Context) {
 	videoTitlePrefix := videoTitle[0 : len(videoTitle)-len(suffix)] // 视频名前缀
 
 	if suffix != ".mp4" {
-		response.CheckFail(ctx, nil, "文件格式不符合要求")
+		response.CheckFail(ctx, nil, response.FileTypeError)
 		return
 	}
 	// 生成自定义文件名
@@ -85,13 +86,13 @@ func UploadMovieVideo(ctx *gin.Context) {
 	dst := path.Join("./files/movie", video.Filename)
 	errSave := ctx.SaveUploadedFile(video, dst)
 	if errSave != nil {
-		response.Fail(ctx, nil, "文件保存失败")
+		response.Fail(ctx, nil, response.FileSaveError)
 		return
 	}
 
 	fileInfo, err := os.Stat("./files/movie/" + video.Filename)
 	if fileInfo == nil || fileInfo.Size() > 1024*1024*500 || err != nil {
-		response.CheckFail(ctx, nil, "文件大小不符合要求")
+		response.CheckFail(ctx, nil, response.FileSizeError)
 		return
 	}
 
@@ -107,7 +108,7 @@ func DeleteResource(ctx *gin.Context) {
 	var id dto.UUID
 	err := ctx.Bind(&id)
 	if err != nil {
-		response.Fail(ctx, nil, "请求错误")
+		response.Fail(ctx, nil, response.RequestError)
 		return
 	}
 	res := admin.DeleteResourceService(id.UUID)

@@ -15,19 +15,22 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/v1/user/register": {
+        "/api/vi/user/register": {
             "post": {
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "User"
-                ],
                 "summary": "用户注册",
                 "parameters": [
                     {
-                        "description": "姓名",
-                        "name": "name",
+                        "description": "手机号码",
+                        "name": "telephone",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "密码",
+                        "name": "password",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -37,7 +40,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "请求成功",
+                        "description": "成功",
                         "schema": {
                             "type": "string"
                         }
@@ -49,7 +52,7 @@ const docTemplate = `{
                         }
                     },
                     "500": {
-                        "description": "内部错误",
+                        "description": "系统错误",
                         "schema": {
                             "type": "string"
                         }
