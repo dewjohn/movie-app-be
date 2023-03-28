@@ -24,7 +24,7 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 		userFile := v1.Group("/upload")
 		userFile.Use(middleWare.UserAuthMiddleWare())
 		{
-			userFile.POST("/avatar", controller.UploadAvatar) // 上传用户头像
+			userFile.PUT("/avatar", controller.UploadAvatar) // 上传用户头像
 		}
 
 		// 管理员文件上传相关
