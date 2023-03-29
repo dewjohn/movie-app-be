@@ -31,6 +31,7 @@ func InitDB() *gorm.DB {
 		panic("fail to connect database, err:" + err.Error())
 	}
 
+	db.Set("gorm:table_options", "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci")
 	// 自动新建表 AutoMigrate 用于自动迁移您的 schema，保持您的 schema 是最新的。
 	db.AutoMigrate(&model.User{})
 	db.AutoMigrate(&model.Admin{})
