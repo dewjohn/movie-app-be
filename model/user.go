@@ -16,4 +16,5 @@ type User struct {
 	Gender    int       `gorm:"default:0"`
 	Birthday  time.Time `gorm:"default:'1970-01-01'"`
 	Sign      string    `gorm:"varchar(50);default:'这个人很懒，什么都没有留下'"`
+	State     int       `gorm:"default:100"`
 }

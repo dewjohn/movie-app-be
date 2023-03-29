@@ -122,9 +122,8 @@ func UserModifyPassword(ctx *gin.Context) {
 		return
 	}
 	// 获取上下文的 user
-	user, _ := ctx.Get("user")
-	modelUser := user.(model.User)
+	userId, _ := ctx.Get("userId")
 
-	res := service.UserModifyPasswordService(requestUser, modelUser)
+	res := service.UserModifyPasswordService(requestUser, userId)
 	response.HandleResponse(ctx, res)
 }

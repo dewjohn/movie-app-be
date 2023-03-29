@@ -12,3 +12,13 @@ type AddAdminDto struct {
 	Password  string `json:"password"`
 	Authority int    `json:"authority"`
 }
+
+type GetUserDto struct {
+	Page     int `json:"page"`
+	PageSize int `json:"page_size"`
+}
+
+type UserStateDto struct {
+	Uid   int `json:"uid"`
+	State int `json:"state"`
+}

@@ -112,13 +112,16 @@ func UserModifyService(requestUser dto.UserModifyDto, userId interface{}, tBirth
 }
 
 // 用户修改密码
-func UserModifyPasswordService(requestUser dto.UserModifyPasswordDto, user model.User) response.ResponseStruct {
+func UserModifyPasswordService(requestUser dto.UserModifyPasswordDto, userId interface{}) response.ResponseStruct {
 	res := response.ResponseStruct{
 		HttpStatus: http.StatusOK,
 		Code:       http.StatusOK,
 		Data:       nil,
 		Msg:        response.OK,
 	}
+	DB := common.GetDB()
+	var user model.User
+	DB.Where("id = ?", userId).First(&user)
 
 	// 验证旧密码
 	isRight := utils.ComparePasswords(user.Password, []byte(requestUser.OldPassword))
@@ -130,7 +133,6 @@ func UserModifyPasswordService(requestUser dto.UserModifyPasswordDto, user model
 	}
 
 	//更新密码
-	DB := common.GetDB()
 	// 加密密码
 	hasedPassword, err1 := bcrypt.GenerateFromPassword([]byte(requestUser.Password), bcrypt.DefaultCost)
 	if err1 != nil {

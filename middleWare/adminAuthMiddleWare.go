@@ -41,7 +41,6 @@ func AdminAuthMiddleWare() gin.HandlerFunc {
 		}
 		// 查询成功
 		ctx.Set("adminId", admin.ID)
-		ctx.Set("admin", admin)
 		ctx.Next()
 	}
 }

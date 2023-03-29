@@ -9,7 +9,8 @@ import (
 var adminJwtKey = []byte("server.jwt_secret")
 
 type AdminClaims struct {
-	AdminId uint
+	AdminId   uint
+	Authority int
 	jwt.RegisteredClaims
 }
 
@@ -17,7 +18,8 @@ type AdminClaims struct {
 func ReleaseAdminToken(admin model.Admin) (string, error) {
 	expirationTime := time.Now().Add(7 * 24 * time.Hour)
 	adminClaims := &AdminClaims{
-		AdminId: admin.ID,
+		AdminId:   admin.ID,
+		Authority: admin.Authority,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expirationTime),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
