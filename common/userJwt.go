@@ -10,6 +10,7 @@ var jwtKey = []byte("secret")
 
 type Claims struct {
 	UserId uint
+	State  int
 	jwt.RegisteredClaims
 }
 
@@ -17,6 +18,7 @@ func ReleaseToken(user model.User) (string, error) {
 	expirationTime := time.Now().Add(1 * 24 * time.Hour)
 	claims := &Claims{
 		UserId: user.ID,
+		State:  user.State,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expirationTime),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
