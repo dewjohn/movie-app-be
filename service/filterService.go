@@ -14,7 +14,7 @@ import (
 func FilterService(request dto.FilterMovieDto) response.ResponseStruct {
 	res := response.ResponseStruct{
 		HttpStatus: http.StatusOK,
-		Code:       200,
+		Code:       response.SuccessCode,
 		Data:       nil,
 		Msg:        response.OK,
 	}

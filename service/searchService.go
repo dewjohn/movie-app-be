@@ -16,7 +16,7 @@ func SearchMovieService(keywords string) response.ResponseStruct {
 	DB.Model(model.Movie{}).Select("id,title,cover").Where("concat(title, origin, type, director, actors, language) like ?", keywords).Scan(&movies)
 	return response.ResponseStruct{
 		HttpStatus: http.StatusOK,
-		Code:       http.StatusOK,
+		Code:       response.SuccessCode,
 		Data:       gin.H{"movies": movies},
 		Msg:        response.OK,
 	}

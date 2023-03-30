@@ -14,7 +14,7 @@ import (
 func UploadCoverService(objectName string, vid int) response.ResponseStruct {
 	res := response.ResponseStruct{
 		HttpStatus: http.StatusOK,
-		Code:       200,
+		Code:       response.SuccessCode,
 		Data:       nil,
 		Msg:        response.OK,
 	}
@@ -24,8 +24,8 @@ func UploadCoverService(objectName string, vid int) response.ResponseStruct {
 		DB := common.GetDB()
 		DB.Where("id = ?", vid).First(&movie)
 		if movie.ID == 0 {
-			res.HttpStatus = http.StatusBadRequest
-			res.Code = 400
+			res.HttpStatus = http.StatusUnprocessableEntity
+			res.Code = response.CheckFailCode
 			res.Msg = response.MovieNotExit
 			return res
 		}
@@ -51,8 +51,8 @@ func UploadVideoService(urls dto.ResDto, vid int, videoTitle string) response.Re
 	DB := common.GetDB()
 	DB.Where("id = ?", vid).First(&movie)
 	if movie.ID == 0 {
-		res.HttpStatus = http.StatusBadRequest
-		res.Code = 400
+		res.HttpStatus = http.StatusUnprocessableEntity
+		res.Code = response.CheckFailCode
 		res.Msg = response.MovieNotExit
 	}
 	tx := DB.Begin()
@@ -65,8 +65,8 @@ func UploadVideoService(urls dto.ResDto, vid int, videoTitle string) response.Re
 	// 创建新的资源
 	if err = tx.Model(&model.Resource{}).Create(&newResource).Error; err != nil {
 		tx.Rollback()
-		res.HttpStatus = http.StatusBadRequest
-		res.Code = 400
+		res.HttpStatus = http.StatusInternalServerError
+		res.Code = response.ServerErrorCode
 		res.Msg = response.FailUploadFile
 		return res
 	}
@@ -77,7 +77,7 @@ func UploadVideoService(urls dto.ResDto, vid int, videoTitle string) response.Re
 func DeleteResourceService(uuid uuid.UUID) response.ResponseStruct {
 	res := response.ResponseStruct{
 		HttpStatus: http.StatusOK,
-		Code:       200,
+		Code:       response.SuccessCode,
 		Data:       nil,
 		Msg:        response.OK,
 	}

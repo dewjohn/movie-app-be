@@ -13,15 +13,15 @@ import (
 func CollectService(vid int, uid interface{}) response.ResponseStruct {
 	res := response.ResponseStruct{
 		HttpStatus: http.StatusOK,
-		Code:       200,
+		Code:       response.SuccessCode,
 		Data:       nil,
 		Msg:        response.OK,
 	}
 	DB := common.GetDB()
 	if utils.IsCollected(DB, vid, uid.(uint)) {
 		res.HttpStatus = http.StatusUnprocessableEntity
-		res.Code = 400
-		res.Msg = "禁止重复收藏"
+		res.Code = response.CheckFailCode
+		res.Msg = response.CollectError
 		return res
 	}
 	newCollect := model.Collect{
@@ -35,21 +35,19 @@ func CollectService(vid int, uid interface{}) response.ResponseStruct {
 
 func DeleteCollectService(vid int, uid interface{}) response.ResponseStruct {
 	res := response.ResponseStruct{
-		HttpStatus: http.StatusOK,
-		Code:       400,
+		HttpStatus: http.StatusUnprocessableEntity,
+		Code:       response.FailCode,
 		Data:       nil,
 		Msg:        response.RequestError,
 	}
 	DB := common.GetDB()
 	var collect model.Collect
 	DB.Where("vid = ? and uid = ?", vid, uid).First(&collect)
-	if collect.ID != 0 {
-		if collect.Uid == uid {
-			DB.Where("vid = ? and uid = ?", vid, uid).Delete(&collect)
-			res.HttpStatus = http.StatusOK
-			res.Code = 200
-			res.Msg = response.OK
-		}
+	if collect.ID != 0 && collect.Uid == uid {
+		DB.Where("vid = ? and uid = ?", vid, uid).Delete(&collect)
+		res.HttpStatus = http.StatusOK
+		res.Code = response.SuccessCode
+		res.Msg = response.OK
 	}
 	return res
 }
@@ -69,7 +67,7 @@ func GetCollectService(page, pageSize int, uid interface{}) response.ResponseStr
 	}
 	return response.ResponseStruct{
 		HttpStatus: http.StatusOK,
-		Code:       http.StatusOK,
+		Code:       response.SuccessCode,
 		Data:       gin.H{"count": total, "collections": collects},
 		Msg:        response.OK,
 	}
@@ -78,7 +76,7 @@ func GetCollectService(page, pageSize int, uid interface{}) response.ResponseStr
 func IsCollectedService(vid int, uid interface{}) response.ResponseStruct {
 	res := response.ResponseStruct{
 		HttpStatus: http.StatusOK,
-		Code:       http.StatusOK,
+		Code:       response.SuccessCode,
 		Data:       nil,
 		Msg:        response.OK,
 	}

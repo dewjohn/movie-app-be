@@ -17,7 +17,7 @@ func AdminLoginService(requestAdmin dto.AdminLoginDto) response.ResponseStruct {
 	DB := common.GetDB()
 	res := response.ResponseStruct{
 		HttpStatus: http.StatusOK,
-		Code:       http.StatusOK,
+		Code:       response.SuccessCode,
 		Data:       nil,
 		Msg:        response.OK,
 	}
@@ -26,15 +26,14 @@ func AdminLoginService(requestAdmin dto.AdminLoginDto) response.ResponseStruct {
 	DB.Where("telephone = ?", requestAdmin.Telephone).First(&admin)
 	if admin.ID == 0 {
 		res.HttpStatus = http.StatusUnprocessableEntity
-		res.Code = 422
+		res.Code = response.CheckFailCode
 		res.Msg = response.UserNoExit
 		return res
 	}
 	// 判断密码是否正确
-	log.Printf(admin.Password, requestAdmin.Password)
 	if err := bcrypt.CompareHashAndPassword([]byte(admin.Password), []byte(requestAdmin.Password)); err != nil {
-		res.HttpStatus = http.StatusBadRequest
-		res.Code = 400
+		res.HttpStatus = http.StatusUnprocessableEntity
+		res.Code = response.CheckFailCode
 		res.Msg = response.PasswordError
 		return res
 	}
@@ -42,7 +41,7 @@ func AdminLoginService(requestAdmin dto.AdminLoginDto) response.ResponseStruct {
 	refreshToken, accessToken, err := common.ReleaseAdminToken(admin)
 	if err != nil {
 		res.HttpStatus = http.StatusInternalServerError
-		res.Code = 500
+		res.Code = response.ServerErrorCode
 		res.Msg = response.SystemError
 		log.Printf("admin_token generate error: %v", err)
 		return res
@@ -63,7 +62,7 @@ func AddAdminService(requestAdmin dto.AddAdminDto) response.ResponseStruct {
 	// 判断手机号是否存在
 	if utils.IsAdminTelephoneExit(DB, requestAdmin.Telephone) {
 		res.HttpStatus = http.StatusUnprocessableEntity
-		res.Code = 422
+		res.Code = response.CheckFailCode
 		res.Msg = response.PhoneRegistered
 		return res
 	}
@@ -71,7 +70,7 @@ func AddAdminService(requestAdmin dto.AddAdminDto) response.ResponseStruct {
 	hasedPassword, err := bcrypt.GenerateFromPassword([]byte(requestAdmin.Password), bcrypt.DefaultCost)
 	if err != nil {
 		res.HttpStatus = http.StatusInternalServerError
-		res.Code = 500
+		res.Code = response.ServerErrorCode
 		res.Msg = response.SystemError
 		return res
 	}
@@ -90,17 +89,16 @@ func AddAdminService(requestAdmin dto.AddAdminDto) response.ResponseStruct {
 func AdminInfoService(adminId uint) response.ResponseStruct {
 	res := response.ResponseStruct{
 		HttpStatus: http.StatusOK,
-		Code:       http.StatusOK,
+		Code:       response.SuccessCode,
 		Data:       nil,
 		Msg:        response.OK,
 	}
 	DB := common.GetDB()
 
 	var admin model.Admin
-	err := DB.Where("id = ? ", adminId).First(&admin).Error
-	if err != nil {
-		res.HttpStatus = http.StatusBadRequest
-		res.Code = 500
+	if err := DB.Where("id = ? ", adminId).First(&admin).Error; err != nil {
+		res.HttpStatus = http.StatusUnprocessableEntity
+		res.Code = response.CheckFailCode
 		res.Msg = response.SystemError
 		return res
 	}

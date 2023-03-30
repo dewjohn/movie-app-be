@@ -15,7 +15,7 @@ import (
 func UploadVideoInfoService(video dto.MovieDto, adminId interface{}, tReleaseTime time.Time) response.ResponseStruct {
 	res := response.ResponseStruct{
 		HttpStatus: http.StatusOK,
-		Code:       200,
+		Code:       response.SuccessCode,
 		Data:       nil,
 		Msg:        response.OK,
 	}
@@ -44,13 +44,21 @@ func UploadVideoInfoService(video dto.MovieDto, adminId interface{}, tReleaseTim
 func ModifyMovieInfoService(vid int, video dto.ModifyMovieDto, tReleaseTime time.Time) response.ResponseStruct {
 	res := response.ResponseStruct{
 		HttpStatus: http.StatusOK,
-		Code:       200,
+		Code:       response.SuccessCode,
 		Data:       nil,
 		Msg:        response.OK,
 	}
 
 	DB := common.GetDB()
-	err := DB.Model(&model.Movie{}).Where("id = ?", vid).Updates(
+	var movie model.Movie
+	DB.Model(&model.Movie{}).Where("id = ?", vid).First(&movie)
+	if movie.ID == 0 {
+		res.HttpStatus = http.StatusBadRequest
+		res.Code = response.CheckFailCode
+		res.Msg = response.MovieNotExit
+		return res
+	}
+	if err := DB.Model(&model.Movie{}).Where("id = ?", vid).Updates(
 		map[string]interface{}{
 			"title":        video.Title,
 			"cover":        video.Cover,
@@ -64,10 +72,9 @@ func ModifyMovieInfoService(vid int, video dto.ModifyMovieDto, tReleaseTime time
 			"language":     video.Language,
 			"introduction": video.Introduction,
 			"score":        video.Score,
-		}).Error
-	if err != nil {
+		}).Error; err != nil {
 		res.HttpStatus = http.StatusInternalServerError
-		res.Code = 500
+		res.Code = response.ServerErrorCode
 		res.Msg = response.SystemError
 	}
 	return res
@@ -76,7 +83,7 @@ func ModifyMovieInfoService(vid int, video dto.ModifyMovieDto, tReleaseTime time
 func GetMovieListService(query dto.GetMovieListDto) response.ResponseStruct {
 	res := response.ResponseStruct{
 		HttpStatus: http.StatusOK,
-		Code:       200,
+		Code:       response.SuccessCode,
 		Data:       nil,
 		Msg:        response.OK,
 	}
@@ -95,7 +102,7 @@ func GetMovieListService(query dto.GetMovieListDto) response.ResponseStruct {
 func GetMovieByIdService(vid int) response.ResponseStruct {
 	res := response.ResponseStruct{
 		HttpStatus: http.StatusOK,
-		Code:       http.StatusOK,
+		Code:       response.SuccessCode,
 		Data:       nil,
 		Msg:        response.OK,
 	}
@@ -104,7 +111,7 @@ func GetMovieByIdService(vid int) response.ResponseStruct {
 	DB.Model(&model.Movie{}).Where("id = ?", vid).First(&movie)
 	if movie.ID == 0 {
 		res.HttpStatus = http.StatusBadRequest
-		res.Code = http.StatusBadRequest
+		res.Code = response.CheckFailCode
 		res.Msg = response.MovieNotExit
 		return res
 	}
@@ -117,7 +124,7 @@ func GetMovieByIdService(vid int) response.ResponseStruct {
 func GetHighScoreMovieService(query dto.GetMovieListDto) response.ResponseStruct {
 	res := response.ResponseStruct{
 		HttpStatus: http.StatusOK,
-		Code:       200,
+		Code:       response.SuccessCode,
 		Data:       nil,
 		Msg:        response.OK,
 	}

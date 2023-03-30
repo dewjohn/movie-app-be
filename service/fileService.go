@@ -11,7 +11,7 @@ import (
 func UploadAvatarService(localFileName string, objectName string, uid uint) response.ResponseStruct {
 	res := response.ResponseStruct{
 		HttpStatus: http.StatusOK,
-		Code:       200,
+		Code:       response.SuccessCode,
 		Data:       nil,
 		Msg:        response.OK,
 	}

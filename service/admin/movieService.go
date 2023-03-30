@@ -14,7 +14,7 @@ import (
 func DeleteMovieVideoService(vid uint) response.ResponseStruct {
 	res := response.ResponseStruct{
 		HttpStatus: http.StatusOK,
-		Code:       200,
+		Code:       response.SuccessCode,
 		Data:       nil,
 		Msg:        response.OK,
 	}
@@ -26,7 +26,7 @@ func DeleteMovieVideoService(vid uint) response.ResponseStruct {
 func GetMovieDataListService(query dto.GetMovieListDto) response.ResponseStruct {
 	res := response.ResponseStruct{
 		HttpStatus: http.StatusOK,
-		Code:       200,
+		Code:       response.SuccessCode,
 		Data:       nil,
 		Msg:        response.OK,
 	}
@@ -49,7 +49,7 @@ func GetMovieDataListService(query dto.GetMovieListDto) response.ResponseStruct 
 func GetMovieByVidService(vid int) response.ResponseStruct {
 	res := response.ResponseStruct{
 		HttpStatus: http.StatusOK,
-		Code:       http.StatusOK,
+		Code:       response.SuccessCode,
 		Data:       nil,
 		Msg:        response.OK,
 	}
@@ -57,8 +57,8 @@ func GetMovieByVidService(vid int) response.ResponseStruct {
 	DB := common.GetDB()
 	DB.Model(&model.Movie{}).Where("id = ?", vid).First(&movie)
 	if movie.ID == 0 {
-		res.HttpStatus = http.StatusBadRequest
-		res.Code = http.StatusBadRequest
+		res.HttpStatus = http.StatusUnprocessableEntity
+		res.Code = response.CheckFailCode
 		res.Msg = response.MovieNotExit
 		return res
 	}

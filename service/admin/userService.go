@@ -12,7 +12,7 @@ import (
 func GetUserService(page, pageSize int) response.ResponseStruct {
 	res := response.ResponseStruct{
 		HttpStatus: http.StatusOK,
-		Code:       200,
+		Code:       response.SuccessCode,
 		Data:       nil,
 		Msg:        response.OK,
 	}
@@ -36,7 +36,7 @@ func ChangeUserStateService(adminId interface{}, stateDto dto.UserStateDto) resp
 	DB := common.GetDB()
 	res := response.ResponseStruct{
 		HttpStatus: http.StatusOK,
-		Code:       http.StatusOK,
+		Code:       response.SuccessCode,
 		Data:       nil,
 		Msg:        response.OK,
 	}
@@ -45,14 +45,14 @@ func ChangeUserStateService(adminId interface{}, stateDto dto.UserStateDto) resp
 	DB.Where("id = ?", adminId).First(&admin)
 	if admin.ID == 0 || admin.Authority < 2000 {
 		res.HttpStatus = http.StatusUnprocessableEntity
-		res.Code = 422
-		res.Msg = "无该管理员或者权限不足"
+		res.Code = response.CheckFailCode
+		res.Msg = response.NoExitAdmin
 		return res
 	}
 	err := DB.Model(model.User{}).Where("id = ?", stateDto.Uid).Update("state", stateDto.State).Error
 	if err != nil {
 		res.HttpStatus = http.StatusInternalServerError
-		res.Code = 500
+		res.Code = response.ServerErrorCode
 		res.Msg = response.SystemError
 	}
 	return res

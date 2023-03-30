@@ -19,14 +19,14 @@ func RegisterService(requestUser dto.RegisterDto) response.ResponseStruct {
 	DB := common.GetDB()
 	res := response.ResponseStruct{
 		HttpStatus: http.StatusOK,
-		Code:       http.StatusOK,
+		Code:       response.SuccessCode,
 		Data:       nil,
 		Msg:        response.OK,
 	}
 	// 判断手机号是否存在
 	if utils.IsTelephoneExist(DB, requestUser.Telephone) {
 		res.HttpStatus = http.StatusUnprocessableEntity
-		res.Code = 422
+		res.Code = response.CheckFailCode
 		res.Msg = response.PhoneRegistered
 		return res
 	}
@@ -35,7 +35,7 @@ func RegisterService(requestUser dto.RegisterDto) response.ResponseStruct {
 	hasedPassword, err := bcrypt.GenerateFromPassword([]byte(requestUser.Password), bcrypt.DefaultCost)
 	if err != nil {
 		res.HttpStatus = http.StatusInternalServerError
-		res.Code = 500
+		res.Code = response.ServerErrorCode
 		res.Msg = response.SystemError
 		return res
 	}
@@ -56,7 +56,7 @@ func LoginService(requestUser dto.LoginDto) response.ResponseStruct {
 	DB := common.GetDB()
 	res := response.ResponseStruct{
 		HttpStatus: http.StatusOK,
-		Code:       http.StatusOK,
+		Code:       response.SuccessCode,
 		Data:       nil,
 		Msg:        response.OK,
 	}
@@ -65,14 +65,14 @@ func LoginService(requestUser dto.LoginDto) response.ResponseStruct {
 	DB.Where("telephone = ?", requestUser.Telephone).First(&user)
 	if user.ID == 0 {
 		res.HttpStatus = http.StatusUnprocessableEntity
-		res.Code = 422
+		res.Code = response.CheckFailCode
 		res.Msg = response.UserNoExit
 		return res
 	}
 	// 判断密码是否正确
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(requestUser.Password)); err != nil {
 		res.HttpStatus = http.StatusBadRequest
-		res.Code = 400
+		res.Code = response.CheckFailCode
 		res.Msg = response.PasswordError
 		return res
 	}
@@ -80,7 +80,7 @@ func LoginService(requestUser dto.LoginDto) response.ResponseStruct {
 	refreshToken, accessToken, err := common.ReleaseUserToken(user)
 	if err != nil {
 		res.HttpStatus = http.StatusInternalServerError
-		res.Code = 500
+		res.Code = response.ServerErrorCode
 		res.Msg = response.SystemError
 		log.Printf("token generate error: %v", err)
 		return res
@@ -93,20 +93,19 @@ func LoginService(requestUser dto.LoginDto) response.ResponseStruct {
 func UserModifyService(requestUser dto.UserModifyDto, userId interface{}, tBirthday time.Time) response.ResponseStruct {
 	res := response.ResponseStruct{
 		HttpStatus: http.StatusOK,
-		Code:       http.StatusOK,
+		Code:       response.SuccessCode,
 		Data:       nil,
 		Msg:        response.OK,
 	}
 	DB := common.GetDB()
-	err := DB.Model(&model.User{}).Where("id = ?", userId).Updates(map[string]interface{}{
+	if err := DB.Model(&model.User{}).Where("id = ?", userId).Updates(map[string]interface{}{
 		"name":     requestUser.Name,
 		"gender":   requestUser.Gender,
 		"birthday": tBirthday,
 		"sign":     requestUser.Sign,
-	}).Error
-	if err != nil {
+	}).Error; err != nil {
 		res.HttpStatus = http.StatusInternalServerError
-		res.Code = 500
+		res.Code = response.ServerErrorCode
 		res.Msg = response.SystemError
 	}
 	return res
@@ -116,7 +115,7 @@ func UserModifyService(requestUser dto.UserModifyDto, userId interface{}, tBirth
 func UserModifyPasswordService(requestUser dto.UserModifyPasswordDto, userId interface{}) response.ResponseStruct {
 	res := response.ResponseStruct{
 		HttpStatus: http.StatusOK,
-		Code:       http.StatusOK,
+		Code:       response.SuccessCode,
 		Data:       nil,
 		Msg:        response.OK,
 	}
@@ -128,7 +127,7 @@ func UserModifyPasswordService(requestUser dto.UserModifyPasswordDto, userId int
 	isRight := utils.ComparePasswords(user.Password, []byte(requestUser.OldPassword))
 	if !isRight {
 		res.HttpStatus = http.StatusBadRequest
-		res.Code = 422
+		res.Code = response.CheckFailCode
 		res.Msg = response.OldPasswordError
 		return res
 	}
@@ -138,14 +137,13 @@ func UserModifyPasswordService(requestUser dto.UserModifyPasswordDto, userId int
 	hasedPassword, err1 := bcrypt.GenerateFromPassword([]byte(requestUser.Password), bcrypt.DefaultCost)
 	if err1 != nil {
 		res.HttpStatus = http.StatusInternalServerError
-		res.Code = 500
+		res.Code = response.ServerErrorCode
 		res.Msg = response.SystemError
 		return res
 	}
-	err := DB.Model(&user).Update("password", hasedPassword).Error
-	if err != nil {
+	if err := DB.Model(&user).Update("password", hasedPassword).Error; err != nil {
 		res.HttpStatus = http.StatusBadRequest
-		res.Code = 500
+		res.Code = response.ServerErrorCode
 		res.Msg = response.SystemError
 		return res
 	}
@@ -155,16 +153,15 @@ func UserModifyPasswordService(requestUser dto.UserModifyPasswordDto, userId int
 func UserInfoService(userId uint) response.ResponseStruct {
 	res := response.ResponseStruct{
 		HttpStatus: http.StatusOK,
-		Code:       http.StatusOK,
+		Code:       response.SuccessCode,
 		Data:       nil,
 		Msg:        response.OK,
 	}
 	DB := common.GetDB()
 	var user model.User
-	err := DB.Where("id = ?", userId).First(&user).Error
-	if err != nil {
+	if err := DB.Where("id = ?", userId).First(&user).Error; err != nil {
 		res.HttpStatus = http.StatusBadRequest
-		res.Code = 400
+		res.Code = response.CheckFailCode
 		res.Msg = response.SystemError
 		return res
 	}

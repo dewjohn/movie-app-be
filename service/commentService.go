@@ -13,14 +13,14 @@ import (
 func CommentService(comment dto.CommentDto, uid interface{}) response.ResponseStruct {
 	res := response.ResponseStruct{
 		HttpStatus: http.StatusOK,
-		Code:       200,
+		Code:       response.SuccessCode,
 		Data:       nil,
 		Msg:        response.OK,
 	}
 	DB := common.GetDB()
 	if !IsMovieExit(DB, comment.Vid) {
 		res.HttpStatus = http.StatusBadRequest
-		res.Code = 400
+		res.Code = response.CheckFailCode
 		res.Msg = response.MovieNotExit
 		return res
 	}
@@ -58,7 +58,7 @@ func GetCommentService(vid int, replyCount int, page int, pageSize int) response
 
 	return response.ResponseStruct{
 		HttpStatus: http.StatusOK,
-		Code:       http.StatusOK,
+		Code:       response.SuccessCode,
 		Data:       gin.H{"count": total, "comment_count": commentCount, "comments": comments},
 		Msg:        response.OK,
 	}
@@ -82,7 +82,7 @@ func GetCommentListService(vid, page, pageSize int) response.ResponseStruct {
 
 	return response.ResponseStruct{
 		HttpStatus: http.StatusOK,
-		Code:       http.StatusOK,
+		Code:       response.SuccessCode,
 		Data:       gin.H{"count": total, "comments": comments},
 		Msg:        response.OK,
 	}
@@ -91,7 +91,7 @@ func GetCommentListService(vid, page, pageSize int) response.ResponseStruct {
 func GetReplyDetailsService(cid, offset, page, pageSize int) response.ResponseStruct {
 	res := response.ResponseStruct{
 		HttpStatus: http.StatusOK,
-		Code:       http.StatusOK,
+		Code:       response.SuccessCode,
 		Data:       nil,
 		Msg:        response.OK,
 	}
@@ -113,17 +113,15 @@ func GetReplyDetailsService(cid, offset, page, pageSize int) response.ResponseSt
 func DeleteCommentService(id uint, uid interface{}) response.ResponseStruct {
 	res := response.ResponseStruct{
 		HttpStatus: http.StatusOK,
-		Code:       http.StatusOK,
+		Code:       response.SuccessCode,
 		Data:       nil,
 		Msg:        response.OK,
 	}
 	DB := common.GetDB()
 	var comment model.Comment
 	DB.Where("id = ?", id).First(&comment)
-	if comment.ID != 0 {
-		if comment.Uid == uid {
-			DB.Where("id = ? and uid = ?", id, uid).Delete(&comment)
-		}
+	if comment.ID != 0 && comment.Uid == uid {
+		DB.Where("id = ? and uid = ?", id, uid).Delete(&comment)
 	}
 
 	return res

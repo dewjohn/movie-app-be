@@ -13,7 +13,7 @@ import (
 func ReviewMovieScoreService(score dto.ScoreDto, uid interface{}) response.ResponseStruct {
 	res := response.ResponseStruct{
 		HttpStatus: http.StatusOK,
-		Code:       http.StatusOK,
+		Code:       response.SuccessCode,
 		Data:       nil,
 		Msg:        response.OK,
 	}
@@ -23,7 +23,7 @@ func ReviewMovieScoreService(score dto.ScoreDto, uid interface{}) response.Respo
 	// 判断对该部电影是否评论过
 	if utils.IsReviewedMovie(DB, score.Vid, uid) {
 		res.HttpStatus = http.StatusUnprocessableEntity
-		res.Code = 422
+		res.Code = response.CheckFailCode
 		res.Msg = response.ReviewScoreExit
 		return res
 	}
@@ -40,7 +40,7 @@ func ReviewMovieScoreService(score dto.ScoreDto, uid interface{}) response.Respo
 func GetMovieScoreAvgService(vid int) response.ResponseStruct {
 	res := response.ResponseStruct{
 		HttpStatus: http.StatusOK,
-		Code:       http.StatusOK,
+		Code:       response.SuccessCode,
 		Data:       nil,
 		Msg:        response.OK,
 	}

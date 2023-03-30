@@ -50,4 +50,8 @@ const (
 	FileSaveError = "文件保存失败"
 
 	FileSizeError = "文件大小不符合要求"
+
+	CollectError = "禁止重复收藏"
+
+	NoExitAdmin = "无该管理员或者权限不足"
 )
