@@ -9,6 +9,7 @@ import (
 	"movie-app/model"
 	"movie-app/response"
 	"movie-app/utils"
+	"movie-app/vo"
 	"net/http"
 )
 
@@ -38,7 +39,7 @@ func AdminLoginService(requestAdmin dto.AdminLoginDto) response.ResponseStruct {
 		return res
 	}
 	// 发放 token
-	adminToken, err := common.ReleaseAdminToken(admin)
+	refreshToken, accessToken, err := common.ReleaseAdminToken(admin)
 	if err != nil {
 		res.HttpStatus = http.StatusInternalServerError
 		res.Code = 500
@@ -46,7 +47,7 @@ func AdminLoginService(requestAdmin dto.AdminLoginDto) response.ResponseStruct {
 		log.Printf("admin_token generate error: %v", err)
 		return res
 	}
-	res.Data = gin.H{"token": adminToken}
+	res.Data = gin.H{"refreshToken": refreshToken, "accessToken": accessToken}
 	return res
 }
 
@@ -83,5 +84,26 @@ func AddAdminService(requestAdmin dto.AddAdminDto) response.ResponseStruct {
 		Authority: requestAdmin.Authority,
 	}
 	DB.Create(&newAdmin)
+	return res
+}
+
+func AdminInfoService(adminId uint) response.ResponseStruct {
+	res := response.ResponseStruct{
+		HttpStatus: http.StatusOK,
+		Code:       http.StatusOK,
+		Data:       nil,
+		Msg:        response.OK,
+	}
+	DB := common.GetDB()
+
+	var admin model.Admin
+	err := DB.Where("id = ? ", adminId).First(&admin).Error
+	if err != nil {
+		res.HttpStatus = http.StatusBadRequest
+		res.Code = 500
+		res.Msg = response.SystemError
+		return res
+	}
+	res.Data = gin.H{"admin": vo.ToAdminVo(admin)}
 	return res
 }

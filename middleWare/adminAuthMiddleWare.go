@@ -4,43 +4,95 @@ import (
 	"github.com/gin-gonic/gin"
 	"movie-app/common"
 	"movie-app/model"
+	"movie-app/response"
 	"net/http"
 	"strings"
 )
 
 func AdminAuthMiddleWare() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		// 获取 header
+		res := response.ResponseStruct{
+			HttpStatus: http.StatusUnauthorized,
+			Code:       4011,
+			Data:       nil,
+			Msg:        response.Unauthorized,
+		}
+
+		// 获取 Authorization header
 		tokenString := ctx.GetHeader("Authorization")
-		// 验证 token 格式
-		if tokenString == "" || !strings.HasPrefix(tokenString, "Bearer ") {
-			ctx.JSON(http.StatusUnauthorized, gin.H{"code": 401, "msg": "请先登录"})
+		parseSuccess, claims, isExpired := ParseAdminTokenString(tokenString, common.AccessTypeToken)
+		if !parseSuccess {
+			if isExpired {
+				// token过期了
+				res.Msg = response.TokenExpired
+				res.Code = 4010
+			}
+			response.HandleResponse(ctx, res)
 			ctx.Abort()
 			return
 		}
-
-		tokenString = tokenString[7:]
-		adminToken, adminClaims, err := common.ParseAdminToken(tokenString)
-		if err != nil || !adminToken.Valid {
-			ctx.JSON(http.StatusUnauthorized, gin.H{"code": 401, "msg": "请先登录"})
-			ctx.Abort()
-			return
-		}
-
-		// token 通过验证，获取 adminClaims 中的 adminId
-		adminId := adminClaims.AdminId
-		DB := common.GetDB()
+		// 验证用户或者管理员是否存在
+		adminId := claims.AdminId
 		var admin model.Admin
-		DB.First(&admin, adminId)
-
-		// 查无此管理员
-		if admin.ID == 0 {
-			ctx.JSON(http.StatusUnauthorized, gin.H{"code": 401, "msg": "请先登录"})
+		DB := common.GetDB()
+		if err := DB.First(&admin, adminId).Error; err != nil || admin.ID == 0 {
+			response.HandleResponse(ctx, res)
 			ctx.Abort()
 			return
 		}
-		// 查询成功
-		ctx.Set("adminId", admin.ID)
+		ctx.Set("adminId", adminId)
+		ctx.Set("adminAuthorization", admin.Authority)
 		ctx.Next()
 	}
+}
+
+func RefreshAdminTokenMiddleWare() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		res := response.ResponseStruct{
+			HttpStatus: http.StatusUnauthorized,
+			Code:       4011,
+			Data:       nil,
+			Msg:        response.Unauthorized,
+		}
+		// 获取 Authorization header
+		tokenString := ctx.GetHeader("Authorization")
+		parseSuccess, claims, isExpired := ParseAdminTokenString(tokenString, common.RefreshTypeToken)
+		if !parseSuccess {
+			if isExpired {
+				// token过期了
+				res.Msg = response.TokenExpired
+				res.Code = 4010
+			}
+			response.HandleResponse(ctx, res)
+			ctx.Abort()
+			return
+		}
+		// 验证管理员是否存在
+		adminId := claims.AdminId
+		var admin model.Admin
+		DB := common.GetDB()
+		if err := DB.First(&admin, adminId).Error; err != nil || admin.ID == 0 {
+			response.HandleResponse(ctx, res)
+			ctx.Abort()
+			return
+		}
+		ctx.Set("adminId", admin.ID)
+		ctx.Set("adminAuthorization", admin.Authority)
+		ctx.Next()
+	}
+}
+
+func ParseAdminTokenString(tokenString, tokenType string) (bool, *common.AdminClaims, bool) {
+	if tokenString == "" || !strings.HasPrefix(tokenString, "Bearer") {
+		return false, nil, false
+	}
+	tokenString = tokenString[7:]
+	token, claims, err, isExpired := common.ParseAdminToken(tokenString, tokenType)
+	if err != nil || !token.Valid {
+		return false, nil, isExpired
+	}
+	if tokenType != claims.Subject {
+		return false, nil, isExpired
+	}
+	return true, claims, isExpired
 }

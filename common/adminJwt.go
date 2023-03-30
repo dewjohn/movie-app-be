@@ -2,11 +2,10 @@ package common
 
 import (
 	"github.com/golang-jwt/jwt/v4"
+	"github.com/spf13/viper"
 	"movie-app/model"
-	"time"
+	"regexp"
 )
-
-var adminJwtKey = []byte("server.jwt_secret")
 
 type AdminClaims struct {
 	AdminId   uint
@@ -14,34 +13,41 @@ type AdminClaims struct {
 	jwt.RegisteredClaims
 }
 
-// 发放管理员 token
-func ReleaseAdminToken(admin model.Admin) (string, error) {
-	expirationTime := time.Now().Add(7 * 24 * time.Hour)
-	adminClaims := &AdminClaims{
-		AdminId:   admin.ID,
-		Authority: admin.Authority,
-		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(expirationTime),
-			IssuedAt:  jwt.NewNumericDate(time.Now()),
-			Issuer:    "movie-app by john",
-			Subject:   "admin_token",
-		},
-	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, adminClaims)
-	tokenString, err := token.SignedString(adminJwtKey)
-
+func ReleaseAdminToken(admin model.Admin) (string, string, error) {
+	refreshToken, err := ReleaseAdminRefreshToken(admin)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
-	return tokenString, nil
-
+	accessToken, err := ReleaseAdminAccessToken(admin)
+	if err != nil {
+		return "", "", err
+	}
+	return refreshToken, accessToken, nil
 }
 
-func ParseAdminToken(tokenString string) (*jwt.Token, *AdminClaims, error) {
-	adminClaims := &AdminClaims{}
-	token, err := jwt.ParseWithClaims(tokenString, adminClaims, func(token *jwt.Token) (i interface{}, e error) {
-		return adminJwtKey, nil
+/**
+* 解析 admin token
+ */
+func ParseAdminToken(tokenString, tokenType string) (*jwt.Token, *AdminClaims, error, bool) {
+	var jwtKey []byte
+	if tokenType == AccessTypeToken {
+		jwtKey = []byte(viper.GetString("server.access_jwt_secret"))
+	} else {
+		jwtKey = []byte(viper.GetString("server.refresh_jwt_secret"))
+	}
+
+	claims := &AdminClaims{}
+	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+		return jwtKey, nil
 	})
-	return token, adminClaims, err
+
+	isExpired := false
+	// 判断token是否过期
+	if err != nil {
+		reg := regexp.MustCompile(`token is expired`)
+		if reg.MatchString(err.Error()) {
+			isExpired = true
+		}
+	}
+	return token, claims, err, isExpired
 }

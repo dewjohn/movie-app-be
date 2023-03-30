@@ -2,47 +2,52 @@ package common
 
 import (
 	"github.com/golang-jwt/jwt/v4"
+	"github.com/spf13/viper"
 	"movie-app/model"
-	"time"
+	"regexp"
 )
 
-var jwtKey = []byte("secret")
-
-type Claims struct {
+type UserClaims struct {
 	UserId uint
 	State  int
 	jwt.RegisteredClaims
 }
 
-func ReleaseToken(user model.User) (string, error) {
-	expirationTime := time.Now().Add(1 * 24 * time.Hour)
-	claims := &Claims{
-		UserId: user.ID,
-		State:  user.State,
-		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(expirationTime),
-			IssuedAt:  jwt.NewNumericDate(time.Now()),
-			Issuer:    "movie-app by john",
-			Subject:   "user token",
-		},
-	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString(jwtKey)
-
+func ReleaseUserToken(user model.User) (string, string, error) {
+	refreshToken, err := ReleaseUserRefreshToken(user)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
-	return tokenString, nil
-
+	accessToken, err := ReleaseUserAccessToken(user)
+	if err != nil {
+		return "", "", err
+	}
+	return refreshToken, accessToken, nil
 }
 
-func ParseToken(tokenString string) (*jwt.Token, *Claims, error) {
-	claims := &Claims{}
+/**
+* 解析 admin token
+ */
+func ParseUserToken(tokenString, tokenType string) (*jwt.Token, *UserClaims, error, bool) {
+	var jwtKey []byte
+	if tokenType == AccessTypeToken {
+		jwtKey = []byte(viper.GetString("server.access_jwt_secret"))
+	} else {
+		jwtKey = []byte(viper.GetString("server.refresh_jwt_secret"))
+	}
 
+	claims := &UserClaims{}
 	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
 		return jwtKey, nil
 	})
 
-	return token, claims, err
+	isExpired := false
+	// 判断token是否过期
+	if err != nil {
+		reg := regexp.MustCompile(`token is expired`)
+		if reg.MatchString(err.Error()) {
+			isExpired = true
+		}
+	}
+	return token, claims, err, isExpired
 }

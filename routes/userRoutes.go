@@ -9,6 +9,7 @@ import (
 func GetUserRoutes(route *gin.RouterGroup) {
 	user := route.Group("/user")
 	{
+		user.GET("/token/refresh", middleWare.RefreshUserTokenMiddleWare(), controller.GetUserAccessToken)
 		user.POST("/register", controller.Register)
 		user.POST("/login", controller.Login)
 

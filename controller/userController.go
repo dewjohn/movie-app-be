@@ -1,12 +1,12 @@
 package controller
 
 import (
+	"movie-app/common"
 	"movie-app/dto"
 	"movie-app/model"
 	"movie-app/response"
 	"movie-app/service"
 	"movie-app/utils"
-	"movie-app/vo"
 	"net/http"
 	"time"
 
@@ -78,8 +78,9 @@ func Login(ctx *gin.Context) {
 
 // 用户获取个人信息
 func UserInfo(ctx *gin.Context) {
-	user, _ := ctx.Get("user")
-	response.Response(ctx, http.StatusOK, 200, gin.H{"user": vo.ToUserVo(user.(model.User))}, response.OK)
+	userId, _ := ctx.Get("userId")
+	res := service.UserInfoService(userId.(uint))
+	response.HandleResponse(ctx, res)
 }
 
 // 用户修改个人信息
@@ -126,4 +127,24 @@ func UserModifyPassword(ctx *gin.Context) {
 
 	res := service.UserModifyPasswordService(requestUser, userId)
 	response.HandleResponse(ctx, res)
+}
+
+/**
+* 通过 refreshtoken 刷新 accesstoken
+ */
+func GetUserAccessToken(ctx *gin.Context) {
+	userId, exist := ctx.Get("userId")
+
+	if exist {
+		DB := common.GetDB()
+		var user model.User
+		if err := DB.First(&user, userId).Error; err != nil {
+			response.Fail(ctx, nil, "请求错误")
+			return
+		}
+		token, _ := common.ReleaseUserAccessToken(user)
+		response.Success(ctx, gin.H{"accessToken": token}, response.OK)
+		return
+	}
+	response.Fail(ctx, nil, "请求错误")
 }

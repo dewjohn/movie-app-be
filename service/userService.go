@@ -8,6 +8,7 @@ import (
 	"movie-app/model"
 	"movie-app/response"
 	"movie-app/utils"
+	"movie-app/vo"
 	"net/http"
 	"time"
 
@@ -76,7 +77,7 @@ func LoginService(requestUser dto.LoginDto) response.ResponseStruct {
 		return res
 	}
 	// 发放token
-	token, err := common.ReleaseToken(user)
+	refreshToken, accessToken, err := common.ReleaseUserToken(user)
 	if err != nil {
 		res.HttpStatus = http.StatusInternalServerError
 		res.Code = 500
@@ -85,7 +86,7 @@ func LoginService(requestUser dto.LoginDto) response.ResponseStruct {
 		return res
 	}
 
-	res.Data = gin.H{"token": token}
+	res.Data = gin.H{"accessToken": accessToken, "refreshToken": refreshToken}
 	return res
 }
 
@@ -148,5 +149,25 @@ func UserModifyPasswordService(requestUser dto.UserModifyPasswordDto, userId int
 		res.Msg = response.SystemError
 		return res
 	}
+	return res
+}
+
+func UserInfoService(userId uint) response.ResponseStruct {
+	res := response.ResponseStruct{
+		HttpStatus: http.StatusOK,
+		Code:       http.StatusOK,
+		Data:       nil,
+		Msg:        response.OK,
+	}
+	DB := common.GetDB()
+	var user model.User
+	err := DB.Where("id = ?", userId).First(&user).Error
+	if err != nil {
+		res.HttpStatus = http.StatusBadRequest
+		res.Code = 400
+		res.Msg = response.SystemError
+		return res
+	}
+	res.Data = gin.H{"user": vo.ToUserVo(user)}
 	return res
 }

@@ -10,7 +10,7 @@ func GetAdminRoutes(route *gin.RouterGroup) {
 	admin := route.Group("/admin")
 	{
 		admin.POST("/login", admin2.AdminLogin)
-
+		admin.GET("/token/refresh", middleWare.RefreshAdminTokenMiddleWare(), admin2.GetAdminAccessToken) // 刷新 accesstoken
 		// 需要管理员登陆
 		adminAuth := admin.Group("/")
 		adminAuth.Use(middleWare.AdminAuthMiddleWare())

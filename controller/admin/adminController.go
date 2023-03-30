@@ -2,12 +2,12 @@ package admin
 
 import (
 	"github.com/gin-gonic/gin"
+	"movie-app/common"
 	"movie-app/dto"
 	"movie-app/model"
 	"movie-app/response"
 	"movie-app/service/admin"
 	"movie-app/utils"
-	"movie-app/vo"
 	"net/http"
 )
 
@@ -42,8 +42,9 @@ func AdminLogin(ctx *gin.Context) {
 }
 
 func AdminInfo(ctx *gin.Context) {
-	adminInfo, _ := ctx.Get("admin")
-	response.Response(ctx, http.StatusOK, 200, gin.H{"admin": vo.ToAdminVo(adminInfo.(model.Admin))}, response.OK)
+	adminId, _ := ctx.Get("adminId")
+	res := admin.AdminInfoService(adminId.(uint))
+	response.HandleResponse(ctx, res)
 }
 
 // 增加管理员
@@ -83,4 +84,24 @@ func AddAdmin(ctx *gin.Context) {
 	}
 	res := admin.AddAdminService(requestAdmin)
 	response.HandleResponse(ctx, res)
+}
+
+/**
+* 通过 refreshtoken 刷新 accesstoken
+ */
+func GetAdminAccessToken(ctx *gin.Context) {
+	adminId, exist := ctx.Get("adminId")
+
+	if exist {
+		DB := common.GetDB()
+		var admin model.Admin
+		if err := DB.First(&admin, adminId).Error; err != nil {
+			response.Fail(ctx, nil, "请求错误")
+			return
+		}
+		token, _ := common.ReleaseAdminAccessToken(admin)
+		response.Success(ctx, gin.H{"accessToken": token}, response.OK)
+		return
+	}
+	response.Fail(ctx, nil, "请求错误")
 }
