@@ -25,6 +25,10 @@ func GetAdminRoutes(route *gin.RouterGroup) {
 			adminAuth.GET("/movie/id", admin2.GetMovieByVid)              // 管理员获取指定Id电影所有信息
 			adminAuth.GET("/user/get", admin2.GetUser)                    // 管理员获取所有用户信息
 			adminAuth.PUT("/user/state", admin2.ChangeUserState)          // 管理员修改用户状态
+			adminAuth.GET("/statistics/comment", admin2.CountComment)     // 统计评论和回复总数
+			adminAuth.GET("/statistics/reply", admin2.CountReply)         // 统计回复数量
+			adminAuth.GET("/statistics/user", admin2.CountUser)           // 统计用户数
+			adminAuth.GET("/statistics/movie", admin2.CountMovie)         // 统计电影数
 		}
 	}
 }

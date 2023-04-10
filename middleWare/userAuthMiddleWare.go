@@ -84,7 +84,7 @@ func RefreshUserTokenMiddleWare() gin.HandlerFunc {
 }
 
 func ParseUserTokenString(tokenString, tokenType string) (bool, *common.UserClaims, bool) {
-	if tokenString == "" || !strings.HasPrefix(tokenString, "Bearer") {
+	if tokenString == "" || !strings.HasPrefix(tokenString, "Bearer") || tokenString == "Bearer" {
 		return false, nil, false
 	}
 	tokenString = tokenString[7:]
