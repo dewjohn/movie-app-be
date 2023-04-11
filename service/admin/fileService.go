@@ -43,7 +43,7 @@ func UploadCoverService(objectName string, vid int) response.ResponseStruct {
 func UploadVideoService(urls dto.ResDto, vid int, videoTitle string) response.ResponseStruct {
 	res := response.ResponseStruct{
 		HttpStatus: http.StatusOK,
-		Code:       200,
+		Code:       2000,
 		Data:       nil,
 		Msg:        response.OK,
 	}

@@ -13,8 +13,7 @@ import (
 
 // RandomString 返回 n 位随机字符
 func RandomString(n int) string {
-	letters := []byte("qwertyuiop[]';lkjhgfdsazxcvbnm,./?><" +
-		"';")
+	letters := []byte("1234567890qwertyuioplkjhgfdsazxcvbnm")
 	result := make([]byte, n)
 	rand.Seed(time.Now().Unix())
 	for i := range result {

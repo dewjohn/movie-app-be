@@ -70,3 +70,13 @@ type ScoreDto struct {
 	Vid   uint    `json:"vid"`
 	Grade float64 `json:"grade"`
 }
+
+type ResourceToAdminDto struct {
+	UUID     uuid.UUID `json:"uuid"`
+	Original string    `json:"original"`
+	Res360   string    `json:"res360"`
+	Res480   string    `json:"res480"`
+	Res720   string    `json:"res720"`
+	Res1080  string    `json:"res1080"`
+	Title    string    `json:"title"`
+}

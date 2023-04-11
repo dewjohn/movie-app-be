@@ -52,14 +52,14 @@ func UploadMovieCover(ctx *gin.Context) {
 }
 
 func UploadMovieVideo(ctx *gin.Context) {
-	vid, _ := strconv.Atoi(ctx.PostForm("vid")) // 从上传视频信息返回值中拿到生成的vid
+	vid := utils.StringToInt(ctx.PostForm("vid")) // 从上传视频信息返回值中拿到生成的vid
 	if vid < 0 {
 		response.Fail(ctx, nil, response.ParameterError)
 		return
 	}
 	video, err := ctx.FormFile("video")
 	if err != nil {
-		response.Fail(ctx, nil, response.FailUploadImage)
+		response.Fail(ctx, nil, response.FailUploadVideo)
 		return
 	}
 	suffix := path.Ext(video.Filename)                              // 视频后缀
@@ -98,7 +98,7 @@ func UploadMovieVideo(ctx *gin.Context) {
 
 	objectName := "movie/" + video.Filename
 	var urls dto.ResDto
-	urls.Original = utils.GetUrl() + "/api/" + objectName
+	urls.Original = utils.GetUrl() + objectName
 
 	res := admin.UploadVideoService(urls, vid, videoTitlePrefix)
 	response.HandleResponse(ctx, res)

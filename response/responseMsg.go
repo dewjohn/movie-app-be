@@ -36,6 +36,7 @@ const (
 	FailUploadImage = "图片上传失败"
 	ImageTypeError  = "图片不符合要求"
 	SaveImageError  = "图片保存失败"
+	FailUploadVideo = "视频上传失败"
 
 	RequestTooMany = "请求数量过多"
 

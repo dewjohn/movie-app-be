@@ -13,7 +13,7 @@ import (
 func ReleaseAdminAccessToken(admin model.Admin) (string, error) {
 	accessJwtKey := []byte(viper.GetString("server.access_jwt_secret"))
 
-	expirationTime := time.Now().Add(1 * time.Minute) // 过期时间 1 分钟
+	expirationTime := time.Now().Add(5 * time.Minute) // 过期时间 5 分钟
 
 	AccessClaims := &AdminClaims{
 		AdminId:   admin.ID,
