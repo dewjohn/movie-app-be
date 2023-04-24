@@ -22,11 +22,13 @@ func GetUserService(page, pageSize int) response.ResponseStruct {
 
 	DB := common.GetDB()
 
+	DB.Model(&model.User{}).Count(&total)
+
 	Pagination := DB.Limit(pageSize).Offset((page - 1) * pageSize)
 
 	Pagination.Model(&model.User{}).
-		Select("avatar, name, email, telephone, gender, birthday, sign, state").
-		Order("created_at desc").Scan(&user).Count(&total)
+		Select("id, avatar, name, email, telephone, gender, birthday, sign, state").
+		Order("created_at desc").Scan(&user)
 
 	res.Data = gin.H{"count": total, "user": user}
 	return res

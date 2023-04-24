@@ -33,9 +33,10 @@ func GetMovieDataListService(query dto.GetMovieListDto) response.ResponseStruct 
 	DB := common.GetDB()
 	var total int64 // 记录总数
 	var movie []model.Movie
+	DB.Model(&model.Movie{}).Count(&total)
 	Pagination := DB.Limit(query.PageSize).Offset((query.Page - 1) * query.PageSize)
 
-	Pagination.Model(&model.Movie{}).Order("created_at desc").Scan(&movie).Count(&total)
+	Pagination.Model(&model.Movie{}).Order("created_at desc").Scan(&movie)
 	// 获取当前视频的resource
 	for i := 0; i < len(movie); i++ {
 		resource := service.GetVideoResource(DB, uint(movie[i].ID))

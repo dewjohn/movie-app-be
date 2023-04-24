@@ -32,6 +32,7 @@ type UserInfoDto struct {
 }
 
 type UserInfoToAdminDto struct {
+	Id        uint      `json:"id"`
 	Avatar    string    `json:"avatar"`
 	Name      string    `json:"name"`
 	Email     string    `json:"email"`
