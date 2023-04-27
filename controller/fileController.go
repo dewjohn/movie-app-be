@@ -15,6 +15,7 @@ func UploadAvatar(ctx *gin.Context) {
 	avatar, err := ctx.FormFile("avatar")
 	if err != nil {
 		response.Fail(ctx, nil, response.FailUploadImage)
+		return
 	}
 	suffix := path.Ext(avatar.Filename) // 获取文件的扩展名
 	if suffix != ".jpg" && suffix != ".png" && suffix != ".webp" && suffix != ".jpeg" {
