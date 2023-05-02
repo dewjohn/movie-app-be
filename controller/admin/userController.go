@@ -25,7 +25,8 @@ func GetUser(ctx *gin.Context) {
 
 const (
 	Normal = 100
-	Banned = 200
+	ShutUp = 200
+	Banned = 300
 )
 
 // 更改用户状态
@@ -36,7 +37,7 @@ func ChangeUserState(ctx *gin.Context) {
 		response.Fail(ctx, nil, response.RequestError)
 		return
 	}
-	if userState.State != Normal && userState.State != Banned {
+	if userState.State != Normal || userState.State != Banned || userState.State != ShutUp {
 		response.CheckFail(ctx, nil, "状态码错误")
 		return
 	}
