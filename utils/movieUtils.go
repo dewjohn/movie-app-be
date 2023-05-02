@@ -62,5 +62,8 @@ func IsCollected(db *gorm.DB, vid int, uid uint) bool {
 }
 
 func GetUrl() string {
-	return "http://localhost:" + viper.GetString("server.port") + "/api/"
+	if len(viper.GetString("server.domain")) == 0 {
+		return "http://localhost:" + viper.GetString("server.port") + "/api/"
+	}
+	return viper.GetString("server.domain") + "/api/"
 }
