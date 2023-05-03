@@ -17,9 +17,9 @@ type Movie struct {
 	SheetLength  int        `gorm:"default:0"`            // 片长
 	Origin       string     `gorm:"varchar(50);"`         // 产地
 	Type         string     `gorm:"varchar(50);"`         // 种类
-	Director     string     `gorm:"varchar(50);"`         // 导演
-	Screenwriter string     `gorm:"varchar(50);"`         // 编剧
-	Actors       string     `gorm:"varchar(50);"`         // 演员
+	Director     string     `gorm:"varchar(255);"`        // 导演
+	Screenwriter string     `gorm:"varchar(255);"`        // 编剧
+	Actors       string     `gorm:"varchar(255);"`        // 演员
 	Language     string     `gorm:"varchar(50);"`         // 语言
 	Introduction string     `gorm:"size:255;"`            // 简介
 	Score        float64    `gorm:"default:0"`            // 评分
