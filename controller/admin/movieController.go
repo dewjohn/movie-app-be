@@ -81,6 +81,16 @@ func UploadVideoInfo(ctx *gin.Context) {
 	response.HandleResponse(ctx, res)
 }
 
+func UploadVideoByUrl(ctx *gin.Context) {
+	var request dto.UploadVideoByUrlDto
+	err := ctx.Bind(&request)
+	if err != nil {
+		response.Fail(ctx, nil, "请求错误")
+	}
+	res := admin.UploadVideoByUrlService(request)
+	response.HandleResponse(ctx, res)
+}
+
 // 修改视频信息
 func ModifyMovieInfo(ctx *gin.Context) {
 	vid := utils.StringToInt(ctx.Query("vid"))

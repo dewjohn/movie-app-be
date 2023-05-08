@@ -80,3 +80,7 @@ type ResourceToAdminDto struct {
 	Res1080  string    `json:"res1080"`
 	Title    string    `json:"title"`
 }
+type UploadVideoByUrlDto struct {
+	Vid uint   `json:"vid"`
+	Url string `json:"url"`
+}

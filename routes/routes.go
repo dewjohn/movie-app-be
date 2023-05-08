@@ -33,6 +33,7 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 		{
 			adminFile.POST("/cover", admin.UploadMovieCover)
 			adminFile.POST("/video", admin.UploadMovieVideo)
+			adminFile.POST("/video/url", admin.UploadVideoByUrl) // 外链上传电影视频
 		}
 		//获取静态文件
 		r.StaticFS("/api/avatar", http.Dir("./files/avatar"))

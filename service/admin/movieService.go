@@ -69,3 +69,39 @@ func GetMovieByVidService(vid int) response.ResponseStruct {
 	res.Data = gin.H{"movie": vo.ToAdminMovieById(movie)}
 	return res
 }
+
+func UploadVideoByUrlService(request dto.UploadVideoByUrlDto) response.ResponseStruct {
+	res := response.ResponseStruct{
+		HttpStatus: http.StatusOK,
+		Code:       2000,
+		Data:       nil,
+		Msg:        response.OK,
+	}
+	var movie model.Movie
+	vid := request.Vid
+	url := request.Url
+	DB := common.GetDB()
+	DB.Where("id = ?", vid).First(&movie)
+	if movie.ID == 0 {
+		res.HttpStatus = http.StatusUnprocessableEntity
+		res.Code = response.CheckFailCode
+		res.Msg = response.MovieNotExit
+	}
+	tx := DB.Begin()
+	var err error
+	var newResource model.Resource
+	newResource.Vid = vid
+	newResource.Title = "外链视频"
+	newResource.Original = url
+
+	// 创建新的资源
+	if err = tx.Model(&model.Resource{}).Create(&newResource).Error; err != nil {
+		tx.Rollback()
+		res.HttpStatus = http.StatusInternalServerError
+		res.Code = response.ServerErrorCode
+		res.Msg = response.FailUploadFile
+		return res
+	}
+	tx.Commit()
+	return res
+}
