@@ -37,7 +37,7 @@ func ChangeUserState(ctx *gin.Context) {
 		response.Fail(ctx, nil, response.RequestError)
 		return
 	}
-	if userState.State != Normal || userState.State != Banned || userState.State != ShutUp {
+	if userState.State != Normal && userState.State != Banned && userState.State != ShutUp {
 		response.CheckFail(ctx, nil, "状态码错误")
 		return
 	}

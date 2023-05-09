@@ -167,19 +167,25 @@ func ModifyMovieInfo(ctx *gin.Context) {
 }
 
 // 删除视频信息
-func DeleteMovieVideo(ctx *gin.Context) {
+func DeleteMovie(ctx *gin.Context) {
 	var video dto.VideoIdDto
 	err := ctx.Bind(&video)
 	if err != nil {
 		response.Fail(ctx, nil, "请求错误")
 		return
 	}
-	id := video.Id
-	if id == 0 {
+	vid := video.Id
+	if vid == 0 {
 		response.CheckFail(ctx, nil, "视频不存在")
 		return
 	}
-	res := admin.DeleteMovieVideoService(id)
+
+	adminAuthorization, _ := ctx.Get("adminAuthorization")
+	if adminAuthorization.(int) <= 1000 {
+		response.CheckFail(ctx, nil, "权限不足")
+		return
+	}
+	res := admin.DeleteMovieService(vid)
 	response.HandleResponse(ctx, res)
 }
 

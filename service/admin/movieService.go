@@ -11,7 +11,7 @@ import (
 	"net/http"
 )
 
-func DeleteMovieVideoService(vid uint) response.ResponseStruct {
+func DeleteMovieService(vid uint) response.ResponseStruct {
 	res := response.ResponseStruct{
 		HttpStatus: http.StatusOK,
 		Code:       response.SuccessCode,
@@ -19,7 +19,10 @@ func DeleteMovieVideoService(vid uint) response.ResponseStruct {
 		Msg:        response.OK,
 	}
 	DB := common.GetDB()
-	DB.Where("id = ?", vid).Delete(&model.Movie{})
+	tx := DB.Begin()
+	tx.Where("vid = ?", vid).Delete(&model.Resource{})
+	tx.Where("id = ?", vid).Delete(&model.Movie{})
+	tx.Commit()
 	return res
 }
 

@@ -11,12 +11,6 @@ import (
 	"net/http"
 )
 
-const (
-	SuperAdmin = 3000
-	Admin      = 2000
-	Auditor    = 1000
-)
-
 // 管理员登陆
 func AdminLogin(ctx *gin.Context) {
 	var requestAdmin = dto.AdminLoginDto{}
@@ -74,7 +68,7 @@ func AddAdmin(ctx *gin.Context) {
 		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, response.PasswordNumberError)
 		return
 	}
-	if authority != Admin && authority != Auditor {
+	if authority != common.Admin && authority != common.Auditor {
 		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, response.AuthorityError)
 		return
 	}
