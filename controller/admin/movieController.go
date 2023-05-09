@@ -189,6 +189,17 @@ func DeleteMovie(ctx *gin.Context) {
 	response.HandleResponse(ctx, res)
 }
 
+func DeleteResource(ctx *gin.Context) {
+	var id dto.UUID
+	err := ctx.Bind(&id)
+	if err != nil {
+		response.Fail(ctx, nil, response.RequestError)
+		return
+	}
+	res := admin.DeleteResourceService(id.UUID)
+	response.HandleResponse(ctx, res)
+}
+
 func GetMovieDataList(ctx *gin.Context) {
 	var query dto.GetMovieListDto
 	query.Page, _ = strconv.Atoi(ctx.Query("page"))

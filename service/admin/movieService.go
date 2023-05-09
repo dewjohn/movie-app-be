@@ -2,6 +2,7 @@ package admin
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"movie-app/common"
 	"movie-app/dto"
 	"movie-app/model"
@@ -106,5 +107,17 @@ func UploadVideoByUrlService(request dto.UploadVideoByUrlDto) response.ResponseS
 		return res
 	}
 	tx.Commit()
+	return res
+}
+
+func DeleteResourceService(uuid uuid.UUID) response.ResponseStruct {
+	res := response.ResponseStruct{
+		HttpStatus: http.StatusOK,
+		Code:       response.SuccessCode,
+		Data:       nil,
+		Msg:        response.OK,
+	}
+	DB := common.GetDB()
+	DB.Where("uuid = ?", uuid).Delete(&model.Resource{})
 	return res
 }
