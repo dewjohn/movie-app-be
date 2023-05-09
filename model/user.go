@@ -15,6 +15,6 @@ type User struct {
 	Password  string    `gorm:"size:225;not null"`
 	Gender    int       `gorm:"default:0"`
 	Birthday  time.Time `gorm:"default:'1970-01-01'"`
-	Sign      string    `gorm:"type:varchar(255);default:'这个人很懒，什么都没有留下' COLLATE utf8mb4_unicode_ci"`
+	Sign      string    `gorm:"type:varchar(255);default:'hello world'"`
 	State     int       `gorm:"default:100"`
 }
