@@ -32,7 +32,7 @@ func InitDB() *gorm.DB {
 	}
 
 	db.Set("gorm:table_options", "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci")
-	// 自动新建表 AutoMigrate 用于自动迁移您的 schema，保持您的 schema 是最新的。
+	// 自动新建表 AutoMigrate 用于自动迁移您的 schema
 	db.AutoMigrate(&model.User{})
 	db.AutoMigrate(&model.Admin{})
 	db.AutoMigrate(&model.Movie{})
@@ -40,6 +40,7 @@ func InitDB() *gorm.DB {
 	db.AutoMigrate(&model.Comment{})
 	db.AutoMigrate(&model.Score{})
 	db.AutoMigrate(&model.Collect{})
+	db.AutoMigrate(model.Configuration{})
 	DB = db
 	return db
 }

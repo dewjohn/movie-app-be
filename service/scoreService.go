@@ -20,7 +20,6 @@ func ReviewMovieScoreService(score dto.ScoreDto, uid interface{}) response.Respo
 
 	DB := common.GetDB()
 
-	// 判断对该部电影是否评论过
 	if utils.IsReviewedMovie(DB, score.Vid, uid) {
 		res.HttpStatus = http.StatusUnprocessableEntity
 		res.Code = response.CheckFailCode
