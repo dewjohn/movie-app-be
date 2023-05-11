@@ -15,21 +15,19 @@ func GetAdminRoutes(route *gin.RouterGroup) {
 		adminAuth := admin.Group("/")
 		adminAuth.Use(middleWare.AdminAuthMiddleWare())
 		{
-			adminAuth.GET("info", admin2.AdminInfo)                       // 获取管理员信息
-			adminAuth.POST("/addAdmin", admin2.AddAdmin)                  // 新增管理员
-			adminAuth.POST("/movie/upload/intro", admin2.UploadVideoInfo) // 1. 上传视频信息 2. 拿到Vid传给 upload/video接口
-			adminAuth.PUT("/movie/modify", admin2.ModifyMovieInfo)        // 管理员修改电影信息
-			adminAuth.PUT("/movie/delete", admin2.DeleteMovie)            // 管理员删除电影信息
-			adminAuth.PUT("/movie/delete/video", admin2.DeleteResource)   // 管理员删除电影视频
-			adminAuth.GET("/movie/get", admin2.GetMovieDataList)          // 管理员获取电影所有信息
-			adminAuth.GET("/movie/id", admin2.GetMovieByVid)              // 管理员获取指定Id电影所有信息
-			adminAuth.GET("/user/get", admin2.GetUser)                    // 管理员获取所有用户信息
-			adminAuth.GET("/user/search", admin2.SearchUser)              // 管理员搜索用户
-			adminAuth.PUT("/user/state", admin2.ChangeUserState)          // 管理员修改用户状态
-			adminAuth.GET("/statistics/comment", admin2.CountComment)     // 统计评论和回复总数
-			adminAuth.GET("/statistics/reply", admin2.CountReply)         // 统计回复数量
-			adminAuth.GET("/statistics/user", admin2.CountUser)           // 统计用户数
-			adminAuth.GET("/statistics/movie", admin2.CountMovie)         // 统计电影数
+			adminAuth.GET("info", admin2.AdminInfo)                                           // 获取管理员信息
+			adminAuth.POST("/addAdmin", admin2.AddAdmin)                                      // 新增管理员
+			adminAuth.POST("/movie/upload/intro", admin2.UploadVideoInfo)                     // 1. 上传视频信息 2. 拿到Vid传给 upload/video接口
+			adminAuth.PUT("/movie/modify", admin2.ModifyMovieInfo)                            // 管理员修改电影信息
+			adminAuth.PUT("/movie/delete", admin2.DeleteMovie)                                // 管理员删除电影信息
+			adminAuth.PUT("/movie/delete/video", admin2.DeleteResource)                       // 管理员删除电影视频
+			adminAuth.GET("/movie/get", admin2.GetMovieDataList)                              // 管理员获取电影所有信息
+			adminAuth.GET("/movie/id", admin2.GetMovieByVid)                                  // 管理员获取指定Id电影所有信息
+			adminAuth.GET("/user/get", admin2.GetUser)                                        // 管理员获取所有用户信息
+			adminAuth.GET("/user/search", admin2.SearchUser)                                  // 管理员搜索用户
+			adminAuth.PUT("/user/state", admin2.ChangeUserState)                              // 管理员修改用户状态
+			adminAuth.GET("/statistics/all", admin2.StatisticsAllData)                        // 统计整站数据 			// 统计电影数量
+			adminAuth.GET("/statistics/recentMovie", admin2.StatisticsUploadMovieRecentMonth) // 统计近三个月上传电影数
 		}
 	}
 }

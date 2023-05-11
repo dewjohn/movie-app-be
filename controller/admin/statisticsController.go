@@ -6,22 +6,12 @@ import (
 	"movie-app/service/admin"
 )
 
-func CountComment(ctx *gin.Context) {
-	res := admin.CountCommentService()
+func StatisticsAllData(ctx *gin.Context) {
+	res := admin.StatisticsAllDataService()
 	response.HandleResponse(ctx, res)
 }
 
-func CountReply(ctx *gin.Context) {
-	res := admin.CountReplyService()
-	response.HandleResponse(ctx, res)
-}
-
-func CountUser(ctx *gin.Context) {
-	res := admin.CountUserService()
-	response.HandleResponse(ctx, res)
-}
-
-func CountMovie(ctx *gin.Context) {
-	res := admin.CountMovieService()
+func StatisticsUploadMovieRecentMonth(ctx *gin.Context) {
+	res := admin.StatisticsUploadMovieRecentMonthService()
 	response.HandleResponse(ctx, res)
 }

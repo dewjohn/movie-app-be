@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-func CountCommentService() response.ResponseStruct {
+func StatisticsAllDataService() response.ResponseStruct {
 	res := response.ResponseStruct{
 		HttpStatus: http.StatusOK,
 		Code:       response.SuccessCode,
@@ -18,41 +18,23 @@ func CountCommentService() response.ResponseStruct {
 		Msg:        response.OK,
 	}
 	DB := common.GetDB()
-	var count int64
-	DB.Model(&model.Comment{}).Count(&count)
-	res.Data = gin.H{"count": count}
-	return res
-}
-
-func CountReplyService() response.ResponseStruct {
-	res := response.ResponseStruct{
-		HttpStatus: http.StatusOK,
-		Code:       response.SuccessCode,
-		Data:       nil,
-		Msg:        response.OK,
+	var countMovie int64
+	var countUser int64
+	var countReply int64
+	var countReview int64
+	DB.Model(&model.Comment{}).Where("deleted_at is null and parent_id = 0").Count(&countReview)
+	DB.Model(&model.Comment{}).Where("deleted_at is null and parent_id > 0").Count(&countReply)
+	DB.Model(&model.User{}).Where("deleted_at is null").Count(&countUser)
+	DB.Model(&model.Movie{}).Where("deleted_at is null").Count(&countMovie)
+	results := dto.StatisticsAllDataDtoResultDto{
+		Type:  []string{"电影数", "用户数", "影评数", "讨论数"},
+		Value: []int64{countMovie, countUser, countReview, countReply},
 	}
-	DB := common.GetDB()
-	var count int64
-	DB.Model(&model.Comment{}).Where("deleted_at is null and parent_id > 0").Count(&count)
-	res.Data = gin.H{"count": count}
+	res.Data = gin.H{"count": results}
 	return res
 }
 
-func CountUserService() response.ResponseStruct {
-	res := response.ResponseStruct{
-		HttpStatus: http.StatusOK,
-		Code:       response.SuccessCode,
-		Data:       nil,
-		Msg:        response.OK,
-	}
-	DB := common.GetDB()
-	var count int64
-	DB.Model(&model.User{}).Where("deleted_at is null").Count(&count)
-	res.Data = gin.H{"count": count}
-	return res
-}
-
-func CountMovieService() response.ResponseStruct {
+func StatisticsUploadMovieRecentMonthService() response.ResponseStruct {
 	res := response.ResponseStruct{
 		HttpStatus: http.StatusOK,
 		Code:       response.SuccessCode,
