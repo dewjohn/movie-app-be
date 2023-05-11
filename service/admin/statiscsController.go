@@ -1,12 +1,14 @@
 package admin
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"movie-app/common"
 	"movie-app/dto"
 	"movie-app/model"
 	"movie-app/response"
 	"net/http"
+	"regexp"
 	"time"
 )
 
@@ -94,5 +96,50 @@ func StatisticsUploadMovieRecentMonthService() response.ResponseStruct {
 	}
 
 	res.Data = gin.H{"count": results}
+	return res
+}
+
+func StatisticsMovieReleaseService() response.ResponseStruct {
+	res := response.ResponseStruct{
+		HttpStatus: http.StatusOK,
+		Code:       response.SuccessCode,
+		Data:       nil,
+		Msg:        response.OK,
+	}
+	DB := common.GetDB()
+	var movies []model.Movie
+	var result = make(map[int]int)
+	DB.Find(&movies)
+	for _, movie := range movies {
+		year := movie.ReleaseTime.Year()
+		result[year]++
+	}
+	res.Data = gin.H{"count": result}
+	return res
+}
+
+func StatisticsMovieReleaseType() response.ResponseStruct {
+	res := response.ResponseStruct{
+		HttpStatus: http.StatusOK,
+		Code:       response.SuccessCode,
+		Data:       nil,
+		Msg:        response.OK,
+	}
+	DB := common.GetDB()
+	var movies []model.Movie
+	re := regexp.MustCompile(`([\p{Han}]+)(?: \/ )?`) // 定义正则表达式，匹配中文字符和斜杠，最后一个中文后面可能没有斜杠
+	var result = make(map[string]int)
+	DB.Find(&movies)
+	for _, movie := range movies {
+		matches := re.FindAllStringSubmatch(movie.Type, -1) // 在字符串中查找所有匹配的子串
+		if len(matches) > 0 {
+			chineseList := make([]string, len(matches))
+			for i, match := range matches {
+				result[match[i]]++
+			}
+			fmt.Printf("chineseList: %v\n", chineseList)
+		}
+	}
+	res.Data = gin.H{"count": result}
 	return res
 }

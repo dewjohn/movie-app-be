@@ -15,3 +15,13 @@ func StatisticsUploadMovieRecentMonth(ctx *gin.Context) {
 	res := admin.StatisticsUploadMovieRecentMonthService()
 	response.HandleResponse(ctx, res)
 }
+
+func StatisticsMovieRelease(ctx *gin.Context) {
+	res := admin.StatisticsMovieReleaseService()
+	response.HandleResponse(ctx, res)
+}
+
+func StatisticsMovieType(ctx *gin.Context) {
+	res := admin.StatisticsMovieReleaseType()
+	response.HandleResponse(ctx, res)
+}

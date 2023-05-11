@@ -28,6 +28,8 @@ func GetAdminRoutes(route *gin.RouterGroup) {
 			adminAuth.PUT("/user/state", admin2.ChangeUserState)                              // 管理员修改用户状态
 			adminAuth.GET("/statistics/all", admin2.StatisticsAllData)                        // 统计整站数据 			// 统计电影数量
 			adminAuth.GET("/statistics/recentMovie", admin2.StatisticsUploadMovieRecentMonth) // 统计近三个月上传电影数
+			adminAuth.GET("/statistics/releaseMovie", admin2.StatisticsMovieRelease)          // 统计电影年代
+			adminAuth.GET("/statistics/typeMovie", admin2.StatisticsMovieType)                // 统计电影类型
 		}
 	}
 }
