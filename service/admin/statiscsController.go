@@ -1,7 +1,6 @@
 package admin
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"movie-app/common"
 	"movie-app/dto"
@@ -135,9 +134,9 @@ func StatisticsMovieReleaseType() response.ResponseStruct {
 		if len(matches) > 0 {
 			chineseList := make([]string, len(matches))
 			for i, match := range matches {
-				result[match[i]]++
+				chineseList[i] = match[1]
+				result[chineseList[i]]++
 			}
-			fmt.Printf("chineseList: %v\n", chineseList)
 		}
 	}
 	res.Data = gin.H{"count": result}
