@@ -27,7 +27,7 @@ func FilterService(request dto.FilterMovieDto) response.ResponseStruct {
 
 	Pagination.Model(&model.Movie{}).
 		Select("id, title, cover, release_time, score").
-		Where(search, request.Value).Scan(&movie).Count(&total)
+		Where(search, fmt.Sprintf("%%%s%%", request.Value)).Scan(&movie).Count(&total)
 
 	res.Data = gin.H{"count": total, "movies": movie}
 
