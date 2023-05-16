@@ -31,10 +31,9 @@ func FilterService(request dto.FilterMovieDto) response.ResponseStruct {
 		if err != nil {
 			panic(err)
 		}
-		formattedTime := time.Date(myTime.Year(), time.January, 1, 0, 0, 0, 0, myTime.Location()).Format("2006-01-02 15:04:05.000")
 		Pagination.Model(&model.Movie{}).
 			Select("id, title, cover, release_time, score").
-			Where(search, fmt.Sprintf("%%%s%%", formattedTime)).Scan(&movie).Count(&total)
+			Where(search, fmt.Sprintf("%%%s%%", myTime)).Scan(&movie).Count(&total)
 	} else {
 		Pagination.Model(&model.Movie{}).
 			Select("id, title, cover, release_time, score").
