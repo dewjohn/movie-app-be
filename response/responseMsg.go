@@ -55,4 +55,6 @@ const (
 	CollectError = "禁止重复收藏"
 
 	NoExitAdmin = "无该管理员或者权限不足"
+
+	NoAuthorization = "无权限"
 )

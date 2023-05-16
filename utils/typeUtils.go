@@ -19,3 +19,29 @@ func StringToUint(v string) uint {
 	}
 	return uint(res)
 }
+
+// 字符串数组去重
+func StringArrayUnique(arr []string) []string {
+	m := make(map[string]bool)
+	result := []string{}
+	for _, item := range arr {
+		if _, ok := m[item]; !ok {
+			m[item] = true
+			result = append(result, item)
+		}
+	}
+	return result
+}
+
+// 数字数组去重
+func IntArrayUnique(arr []int) []int {
+	m := make(map[int]bool)
+	result := []int{}
+	for _, item := range arr {
+		if _, ok := m[item]; !ok {
+			m[item] = true
+			result = append(result, item)
+		}
+	}
+	return result
+}

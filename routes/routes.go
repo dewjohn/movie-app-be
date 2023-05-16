@@ -20,6 +20,8 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 		GetMovieRoutes(v1)
 		GetCommentRoutes(v1)
 		GetCollectRoutes(v1)
+		GetCatetoryRoutes(v1)
+
 		// 用户文件上传相关
 		userFile := v1.Group("/upload")
 		userFile.Use(middleWare.UserAuthMiddleWare())

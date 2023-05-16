@@ -49,6 +49,11 @@ func AddAdmin(ctx *gin.Context) {
 		response.Response(ctx, http.StatusBadRequest, 400, nil, response.RequestError)
 		return
 	}
+	adminAuthorization, _ := ctx.Get("adminAuthorization")
+	if adminAuthorization.(int) < 2000 {
+		response.CheckFail(ctx, nil, response.NoAuthorization)
+		return
+	}
 	name := requestAdmin.Name
 	email := requestAdmin.Email
 	telephone := requestAdmin.Telephone

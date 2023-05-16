@@ -55,7 +55,7 @@ func AddAdminService(requestAdmin dto.AddAdminDto) response.ResponseStruct {
 	DB := common.GetDB()
 	res := response.ResponseStruct{
 		HttpStatus: http.StatusOK,
-		Code:       http.StatusOK,
+		Code:       response.SuccessCode,
 		Data:       nil,
 		Msg:        response.OK,
 	}

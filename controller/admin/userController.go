@@ -2,6 +2,7 @@ package admin
 
 import (
 	"github.com/gin-gonic/gin"
+	"movie-app/common"
 	"movie-app/dto"
 	"movie-app/response"
 	"movie-app/service/admin"
@@ -23,12 +24,6 @@ func GetUser(ctx *gin.Context) {
 	response.HandleResponse(ctx, res)
 }
 
-const (
-	Normal = 100
-	ShutUp = 200
-	Banned = 300
-)
-
 // 更改用户状态
 func ChangeUserState(ctx *gin.Context) {
 	var userState dto.UserStateDto
@@ -37,7 +32,7 @@ func ChangeUserState(ctx *gin.Context) {
 		response.Fail(ctx, nil, response.RequestError)
 		return
 	}
-	if userState.State != Normal && userState.State != Banned && userState.State != ShutUp {
+	if userState.State != common.Normal && userState.State != common.Banned && userState.State != common.ShutUp {
 		response.CheckFail(ctx, nil, "状态码错误")
 		return
 	}
