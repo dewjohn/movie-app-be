@@ -32,6 +32,6 @@ func InitConfig() {
 	viper.AddConfigPath(workDir + "/config")
 	err := viper.ReadInConfig()
 	if err != nil {
-		panic("")
+		panic("fail to server")
 	}
 }

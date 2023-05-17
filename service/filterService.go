@@ -9,7 +9,6 @@ import (
 	"movie-app/response"
 	"movie-app/vo"
 	"net/http"
-	"time"
 )
 
 func FilterService(request dto.FilterMovieDto) response.ResponseStruct {
@@ -27,13 +26,9 @@ func FilterService(request dto.FilterMovieDto) response.ResponseStruct {
 	search := fmt.Sprintf("%s like ?", request.Column)
 
 	if request.Column == "release_time" {
-		myTime, err := time.Parse("2006", request.Value)
-		if err != nil {
-			panic(err)
-		}
 		Pagination.Model(&model.Movie{}).
 			Select("id, title, cover, release_time, score").
-			Where(search, fmt.Sprintf("%%%s%%", myTime)).Scan(&movie).Count(&total)
+			Where("extract(year from release_time) like ?", request.Value).Scan(&movie).Count(&total)
 	} else {
 		Pagination.Model(&model.Movie{}).
 			Select("id, title, cover, release_time, score").
