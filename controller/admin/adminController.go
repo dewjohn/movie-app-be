@@ -49,9 +49,22 @@ func AddAdmin(ctx *gin.Context) {
 		response.Response(ctx, http.StatusBadRequest, 400, nil, response.RequestError)
 		return
 	}
-	adminAuthorization, _ := ctx.Get("adminAuthorization")
-	if adminAuthorization.(int) < 2000 {
-		response.CheckFail(ctx, nil, response.NoAuthorization)
+
+	adminAuth, _ := ctx.Get("adminAuthorization")
+	if adminAuth.(int) == 3000 {
+		if requestAdmin.Authority != common.Auditor && requestAdmin.Authority != common.Admin && requestAdmin.Authority != 0 {
+			response.CheckFail(ctx, nil, "状态码错误")
+			return
+		}
+	}
+	if adminAuth.(int) == 2000 {
+		if requestAdmin.Authority != common.Auditor && requestAdmin.Authority != 0 {
+			response.CheckFail(ctx, nil, "状态码错误")
+			return
+		}
+	}
+	if adminAuth.(int) < 2000 {
+		response.CheckFail(ctx, nil, "权限不足")
 		return
 	}
 	name := requestAdmin.Name
