@@ -109,11 +109,20 @@ func ChangeAdminAuthorization(ctx *gin.Context) {
 		response.Fail(ctx, nil, response.RequestError)
 		return
 	}
-	if adminAuthorization.Authorization != common.Auditor && adminAuthorization.Authorization != common.Admin && adminAuthorization.Authorization != 0 {
-		response.CheckFail(ctx, nil, "状态码错误")
-		return
-	}
+
 	adminAuth, _ := ctx.Get("adminAuthorization")
+	if adminAuth.(int) == 3000 {
+		if adminAuthorization.Authorization != common.Auditor && adminAuthorization.Authorization != common.Admin && adminAuthorization.Authorization != 0 {
+			response.CheckFail(ctx, nil, "状态码错误")
+			return
+		}
+	}
+	if adminAuth.(int) == 2000 {
+		if adminAuthorization.Authorization != common.Auditor && adminAuthorization.Authorization != 0 {
+			response.CheckFail(ctx, nil, "状态码错误")
+			return
+		}
+	}
 	if adminAuth.(int) < 2000 {
 		response.CheckFail(ctx, nil, "权限不足")
 		return
