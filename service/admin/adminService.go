@@ -105,25 +105,3 @@ func AdminInfoService(adminId uint) response.ResponseStruct {
 	res.Data = gin.H{"admin": vo.ToAdminVo(admin)}
 	return res
 }
-
-func GetAdminService(page, pageSize int) response.ResponseStruct {
-	res := response.ResponseStruct{
-		HttpStatus: http.StatusOK,
-		Code:       response.SuccessCode,
-		Data:       nil,
-		Msg:        response.OK,
-	}
-
-	var total int64
-	var admin []dto.GetAdminDto
-
-	DB := common.GetDB()
-
-	Pagination := DB.Limit(pageSize).Offset((page - 1) * pageSize)
-
-	Pagination.Model(&model.Admin{}).
-		Select("id, name, email, telephone, authority").Scan(&admin).Count(&total)
-
-	res.Data = gin.H{"count": total, "admin": admin}
-	return res
-}

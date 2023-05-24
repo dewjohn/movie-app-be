@@ -15,9 +15,8 @@ func GetAdminRoutes(route *gin.RouterGroup) {
 		adminAuth := admin.Group("/")
 		adminAuth.Use(middleWare.AdminAuthMiddleWare())
 		{
-			adminAuth.GET("/info", admin2.AdminInfo)                                          // 获取管理员信息
+			adminAuth.GET("info", admin2.AdminInfo)                                           // 获取管理员信息
 			adminAuth.POST("/addAdmin", admin2.AddAdmin)                                      // 新增管理员
-			adminAuth.GET("/get", admin2.GetAdmin)                                            // 获取管理员列表
 			adminAuth.POST("/movie/upload/intro", admin2.UploadVideoInfo)                     // 1. 上传视频信息 2. 拿到Vid传给 upload/video接口
 			adminAuth.PUT("/movie/modify", admin2.ModifyMovieInfo)                            // 管理员修改电影信息
 			adminAuth.PUT("/movie/delete", admin2.DeleteMovie)                                // 管理员删除电影信息

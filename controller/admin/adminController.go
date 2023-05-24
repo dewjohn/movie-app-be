@@ -85,22 +85,6 @@ func AddAdmin(ctx *gin.Context) {
 	response.HandleResponse(ctx, res)
 }
 
-// 获取管理员列表
-func GetAdmin(ctx *gin.Context) {
-	page := utils.StringToInt(ctx.Query("page"))
-	pageSize := utils.StringToInt(ctx.Query("page_size"))
-	if page <= 0 || pageSize <= 0 {
-		response.Fail(ctx, nil, response.PageError)
-		return
-	}
-	if pageSize >= 30 {
-		response.Fail(ctx, nil, response.RequestTooMany)
-		return
-	}
-	res := admin.GetAdminService(page, pageSize)
-	response.HandleResponse(ctx, res)
-}
-
 /**
 * 通过 refreshtoken 刷新 accesstoken
  */
