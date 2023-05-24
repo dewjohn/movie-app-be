@@ -22,3 +22,11 @@ type UserStateDto struct {
 	Uid   int `json:"uid"`
 	State int `json:"state"`
 }
+
+type GetAdminDto struct {
+	Id        uint   `json:"id"`
+	Name      string `json:"name"`
+	Email     string `json:"email"`
+	Telephone string `json:"telephone"`
+	Authority int    `json:"authority"`
+}
