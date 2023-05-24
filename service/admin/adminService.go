@@ -105,3 +105,42 @@ func AdminInfoService(adminId uint) response.ResponseStruct {
 	res.Data = gin.H{"admin": vo.ToAdminVo(admin)}
 	return res
 }
+
+func ChangeAdminAuthorizationService(adminAuthorization dto.ChangeAdminDto) response.ResponseStruct {
+	DB := common.GetDB()
+	res := response.ResponseStruct{
+		HttpStatus: http.StatusOK,
+		Code:       response.SuccessCode,
+		Data:       nil,
+		Msg:        response.OK,
+	}
+	err := DB.Model(model.Admin{}).Where("id = ?", adminAuthorization.AdminId).Update("authority", adminAuthorization.Authorization).Error
+	if err != nil {
+		res.HttpStatus = http.StatusInternalServerError
+		res.Code = response.ServerErrorCode
+		res.Msg = response.SystemError
+	}
+	return res
+}
+
+func GetAdminService(page, pageSize int) response.ResponseStruct {
+	res := response.ResponseStruct{
+		HttpStatus: http.StatusOK,
+		Code:       response.SuccessCode,
+		Data:       nil,
+		Msg:        response.OK,
+	}
+
+	var total int64
+	var admin []dto.GetAdminDto
+
+	DB := common.GetDB()
+
+	Pagination := DB.Limit(pageSize).Offset((page - 1) * pageSize)
+
+	Pagination.Model(&model.Admin{}).
+		Select("id, name, email, telephone, authority").Scan(&admin).Count(&total)
+
+	res.Data = gin.H{"count": total, "admin": admin}
+	return res
+}

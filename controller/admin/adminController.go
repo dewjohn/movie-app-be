@@ -85,6 +85,43 @@ func AddAdmin(ctx *gin.Context) {
 	response.HandleResponse(ctx, res)
 }
 
+// 获取管理员列表
+func GetAdmin(ctx *gin.Context) {
+	page := utils.StringToInt(ctx.Query("page"))
+	pageSize := utils.StringToInt(ctx.Query("page_size"))
+	if page <= 0 || pageSize <= 0 {
+		response.Fail(ctx, nil, response.PageError)
+		return
+	}
+	if pageSize >= 30 {
+		response.Fail(ctx, nil, response.RequestTooMany)
+		return
+	}
+	res := admin.GetAdminService(page, pageSize)
+	response.HandleResponse(ctx, res)
+}
+
+// 修改管理员权限
+func ChangeAdminAuthorization(ctx *gin.Context) {
+	var adminAuthorization dto.ChangeAdminDto
+	err := ctx.Bind(&adminAuthorization)
+	if err != nil {
+		response.Fail(ctx, nil, response.RequestError)
+		return
+	}
+	if adminAuthorization.Authorization != common.Auditor && adminAuthorization.Authorization != common.Admin && adminAuthorization.Authorization != 0 {
+		response.CheckFail(ctx, nil, "状态码错误")
+		return
+	}
+	adminAuth, _ := ctx.Get("adminAuthorization")
+	if adminAuth.(int) < 2000 {
+		response.CheckFail(ctx, nil, "权限不足")
+		return
+	}
+	res := admin.ChangeAdminAuthorizationService(adminAuthorization)
+	response.HandleResponse(ctx, res)
+}
+
 /**
 * 通过 refreshtoken 刷新 accesstoken
  */

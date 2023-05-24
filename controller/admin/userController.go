@@ -36,7 +36,11 @@ func ChangeUserState(ctx *gin.Context) {
 		response.CheckFail(ctx, nil, "状态码错误")
 		return
 	}
-	adminId, _ := ctx.Get("adminId")
-	res := admin.ChangeUserStateService(adminId, userState)
+	adminAuth, _ := ctx.Get("adminAuthorization")
+	if adminAuth.(uint) < 2000 {
+		response.CheckFail(ctx, nil, "权限不足")
+		return
+	}
+	res := admin.ChangeUserStateService(userState)
 	response.HandleResponse(ctx, res)
 }

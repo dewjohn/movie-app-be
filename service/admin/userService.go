@@ -34,22 +34,13 @@ func GetUserService(page, pageSize int) response.ResponseStruct {
 	return res
 }
 
-func ChangeUserStateService(adminId interface{}, stateDto dto.UserStateDto) response.ResponseStruct {
+func ChangeUserStateService(stateDto dto.UserStateDto) response.ResponseStruct {
 	DB := common.GetDB()
 	res := response.ResponseStruct{
 		HttpStatus: http.StatusOK,
 		Code:       response.SuccessCode,
 		Data:       nil,
 		Msg:        response.OK,
-	}
-
-	var admin model.Admin
-	DB.Where("id = ?", adminId).First(&admin)
-	if admin.ID == 0 || admin.Authority < 2000 {
-		res.HttpStatus = http.StatusUnprocessableEntity
-		res.Code = response.CheckFailCode
-		res.Msg = response.NoExitAdmin
-		return res
 	}
 	err := DB.Model(model.User{}).Where("id = ?", stateDto.Uid).Update("state", stateDto.State).Error
 	if err != nil {
